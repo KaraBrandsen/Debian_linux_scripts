@@ -6,7 +6,7 @@ LIBREST_PORT=8090                                       #Port used by Libre Spee
 echo "-----------------------------Installing Libre Speed Test-----------------------------"
 
 echo "Installing Nginx"
-apt install nginx mysql-server php-fpm php-mysql php-image-text php-gd php-sqlite3 -y
+apt install nginx mariadb-server php-fpm php-mysql php-image-text php-gd php-sqlite3 -y
 
 rm -rf /etc/nginx/sites-available/speedtest
 

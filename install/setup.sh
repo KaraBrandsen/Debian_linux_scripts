@@ -348,7 +348,7 @@ if [ "$INSTALL_LIBRE_SPEEDTEST" == "true" ] ; then
     echo "-----------------------------Installing Libre Speed Test-----------------------------"
 
     echo "Installing Nginx"
-    apt install nginx mysql-server php-fpm php-mysql php-image-text php-gd php-sqlite3 -y
+    apt install nginx mariadb-server php-fpm php-mysql php-image-text php-gd php-sqlite3 -y
 
     rm -rf /etc/nginx/sites-available/speedtest
 
