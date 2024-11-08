@@ -58,6 +58,7 @@ git clone https://github.com/KaraBrandsen/wake-on-lan.php.git
 sleep 3
 
 cp -f ./wake-on-lan.php/wake-on-lan.php /var/www/html/wol-server/index.php
+cp -f ./wake-on-lan.php/favicon.ico /var/www/html/wol-server/
 rm -rf ./wake-on-lan.php
 
 cat <<EOF | tee /var/www/html/wol-server/config.json >/dev/null
