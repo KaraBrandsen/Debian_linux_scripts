@@ -1,7 +1,7 @@
 #!/bin/bash
 
 WOL_SERVER_PORT=8079                                       #Port used by Wake on LAN server
-DEST_MAC=02:00:d3:f0:b1:4d                                 #MAC Address of the machine to wake up
+DEST_MAC=C8:CB:B8:CF:DF:A5                                 #MAC Address of the machine to wake up
 DEST_IP=192.168.194.1                                      #IP Address of the machine to wake up
 DEST_PORT=9                                                #Target port. Port 9 is used for wake on lan
 DEST_SUBNET=24                                             #Target Subnet.
@@ -52,9 +52,8 @@ echo "Cloning Wake on LAN Server"
 
 rm -rf /var/www/html/wol-server/
 mkdir -p /var/www/html/wol-server
-chown -R www-data:www-data /var/www/html/wol-server
 
-git clone https://github.com/AndiSHFR/wake-on-lan.php.git
+git clone https://github.com/KaraBrandsen/wake-on-lan.php.git
 
 sleep 3
 
@@ -72,5 +71,7 @@ cat <<EOF | tee /var/www/html/wol-server/config.json >/dev/null
     }
 ]
 EOF
+
+chown -R www-data:www-data /var/www/html/wol-server
 
 echo "Installled Wake on LAN Server"
