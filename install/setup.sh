@@ -103,12 +103,12 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_PIHOLE=false                    #Install Pihole - set to false to skip
     INSTALL_HASS=false                      #Install Home Assistant - set to false to skip
     INSTALL_LIBRE_SPEEDTEST=false           #Install Libre Speedtest Server - set to false to skip
-    INSTALL_FILE_SERVER=false               #Install MergerFS and SAMBA - set to false to skip
+    INSTALL_FILE_SERVER=true                #Install MergerFS and SAMBA - set to false to skip
     INSTALL_SABNZBD=true                    #Install SABNZBD - set to false to skip
     INSTALL_DELUGE=true                     #Install Deluge - set to false to skip
     INSTALL_SONARR=true                     #Install Sonarr - set to false to skip
     INSTALL_RADARR=true                     #Install Radarr - set to false to skip
-    INSTALL_PLEX=true                       #Install Plex Server- set to false to skip
+    INSTALL_PLEX_SERVER=true                #Install Plex Server- set to false to skip
     INSTALL_UPTIME_KUMA=false               #Install Uptime Kuma - set to false to skip
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
@@ -123,19 +123,19 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_PIHOLE=true                     #Install Pihole - set to false to skip
     INSTALL_HASS=true                       #Install Home Assistant - set to false to skip
     INSTALL_LIBRE_SPEEDTEST=true            #Install Libre Speedtest Server - set to false to skip
-    INSTALL_FILE_SERVER=true                #Install MergerFS and SAMBA - set to false to skip
+    INSTALL_FILE_SERVER=false               #Install MergerFS and SAMBA - set to false to skip
     INSTALL_SABNZBD=false                   #Install SABNZBD - set to false to skip
     INSTALL_DELUGE=false                    #Install Deluge - set to false to skip
     INSTALL_SONARR=false                    #Install Sonarr - set to false to skip
     INSTALL_RADARR=false                    #Install Radarr - set to false to skip
-    INSTALL_PLEX=false                      #Install Plex Server- set to false to skip
+    INSTALL_PLEX_SERVER=false               #Install Plex Server- set to false to skip
     INSTALL_UPTIME_KUMA=false               #Install Uptime Kuma - set to false to skip                
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
 fi
 
-if [ "$ARG" == "desktop" ] ; then
+if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     INSTALL_ZEROTIER=true                   #Install Zerotier - set to false to skip
     INSTALL_ZEROTIER_ROUTER=false           #Install Zerotier - set to false to skip
     INSTALL_PIHOLE=false                    #Install Pihole - set to false to skip
@@ -146,7 +146,7 @@ if [ "$ARG" == "desktop" ] ; then
     INSTALL_DELUGE=false                    #Install Deluge - set to false to skip
     INSTALL_SONARR=false                    #Install Sonarr - set to false to skip
     INSTALL_RADARR=false                    #Install Radarr - set to false to skip
-    INSTALL_PLEX=false                      #Install Plex Server - set to false to skip
+    INSTALL_PLEX_SERVER=false               #Install Plex Server - set to false to skip
     INSTALL_UPTIME_KUMA=false               #Install Uptime Kuma - set to false to skip
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=true           #Install Shell Extensions - set to false to skip
@@ -158,28 +158,34 @@ if [ "$ARG" == "desktop" ] ; then
         apt install flatpak gnome-software-plugin-flatpak gnome-shell-extension-manager piper gir1.2-gtop-2.0 lm-sensors gnome-tweaks gparted -y
     fi
 
-    DISTRO=$(lsb_release -a | grep "Distributor" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
+    snap refresh
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 
 
-    if [ "$DISTRO" == "Ubuntu" ]; then
-        VERSION=$(lsb_release -a | grep "Release" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
+    if [ "$ARG" == "desktop" ] ; then
+        DISTRO=$(lsb_release -a | grep "Distributor" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
 
-        if [ "$VERSION" -gt 22 ]; then
-            dpkg --add-architecture i386
-            apt update
-            apt install steam-installer -y
-        else
-            apt install steam -y
+        if [ "$DISTRO" == "Ubuntu" ]; then
+            VERSION=$(lsb_release -a | grep "Release" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
+
+            if [ "$VERSION" -gt 22 ]; then
+                dpkg --add-architecture i386
+                apt update
+                apt install steam-installer -y
+            else
+                apt install steam -y
+            fi
+
+            snap install --classic code
         fi
 
-        snap refresh
-        snap install --classic code
+        flatpak install flathub com.google.Chrome com.discordapp.Discord org.videolan.VLC com.spotify.Client org.gimp.GIMP org.libreoffice.LibreOffice io.github.mimbrero.WhatsAppDesktop org.signal.Signal org.inkscape.Inkscape com.slack.Slack com.adobe.Reader com.skype.Client tv.plex.PlexDesktop cc.arduino.IDE2 org.raspberrypi.rpi-imager com.ultimaker.cura io.github.prateekmedia.appimagepool org.kicad.KiCad org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq org.wireshark.Wireshark us.zoom.Zoom com.github.tchx84.Flatseal -y
+    else
+        INSTALL_SHARES=true
+        flatpak install flathub com.google.Chrome org.videolan.VLC com.spotify.Client org.libreoffice.LibreOffice com.adobe.Reader com.skype.Client tv.plex.PlexDesktop io.github.prateekmedia.appimagepool org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq us.zoom.Zoom com.github.tchx84.Flatseal -y
     fi
+fi 
 
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 
-    flatpak install flathub com.google.Chrome com.discordapp.Discord org.videolan.VLC com.spotify.Client org.gimp.GIMP org.libreoffice.LibreOffice io.github.mimbrero.WhatsAppDesktop org.signal.Signal org.inkscape.Inkscape com.slack.Slack com.adobe.Reader com.skype.Client tv.plex.PlexDesktop cc.arduino.IDE2 org.raspberrypi.rpi-imager com.ultimaker.cura io.github.prateekmedia.appimagepool org.kicad.KiCad org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq org.wireshark.Wireshark us.zoom.Zoom -y
-fi
-
-apt install curl nano jq build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common -y
+apt install curl nano jq build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
 
 #Constants
 APP_UID=$SUDO_USER
@@ -191,6 +197,8 @@ if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     if ! command -v gnome-shell 2>&1 >/dev/null ; then
         echo "Gnome Shell could not be found. Not installing shell extensions."
         INSTALL_SHELL_EXTENSIONS=false
+    else
+        GNOME_VERSION=$(gnome-shell --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
     fi
 fi
 
@@ -1241,7 +1249,7 @@ EOF
 fi
 
 #Plex Media Server
-if [ "$INSTALL_PLEX" == "true" ] ; then
+if [ "$INSTALL_PLEX_SERVER" == "true" ] ; then
     echo "-----------------------------Installing Plex-----------------------------"
 
     curl -s https://downloads.plex.tv/plex-keys/PlexSign.key | apt-key add -
@@ -1321,7 +1329,7 @@ if [ "$INSTALL_UPTIME_KUMA" == "true" ] ; then
     if [ "$INSTALL_RADARR" == "true" ] ; then
         echo "  api.add_monitor(type=MonitorType.HTTP, name='Radarr', url=\"http://localhost:$RADARR_PORT\")" >> init.py
     fi
-    if [ "$INSTALL_PLEX" == "true" ] ; then
+    if [ "$INSTALL_PLEX_SERVER" == "true" ] ; then
         echo "  api.add_monitor(type=MonitorType.HTTP, name='Plex', url=\"http://localhost:32400/web\")" >> init.py
     fi
 
@@ -1390,7 +1398,7 @@ if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     for i in "${EXTENSION_LIST[@]}" ; do
         EXTENSION_ID=$(curl -s $i | grep -oP 'data-uuid="\K[^"]+')
         SEARCH_ID=$(echo $EXTENSION_ID | cut -d '@' -f 1)
-        VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map | map(.pk) | max')
+        VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map."'$GNOME_VERSION'".pk')
 
         echo "Installing: $EXTENSION_ID"
 
@@ -1523,7 +1531,7 @@ fi
 if [ "$INSTALL_RADARR" == "true" ] ; then
     echo "Radarr: $RADARR_URL"
 fi
-if [ "$INSTALL_PLEX" == "true" ] ; then
+if [ "$INSTALL_PLEX_SERVER" == "true" ] ; then
     echo "Plex: $PLEX_URL/web"
 fi
 echo ""
