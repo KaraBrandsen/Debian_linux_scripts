@@ -1,0 +1,38 @@
+autoinstall:
+  version: 1
+  source:
+    search_drivers: true
+    id: ubuntu-server-minimal
+  drivers:
+    install: true
+  kernel:
+    flavor: hwe
+  updates: all
+  storage:
+    layout:
+      name: direct
+  identity:
+    realname: 'User'
+    hostname: user-server
+    password: "Run mkpasswd -m sha-512 ubuntupass"
+    username: user
+  locale: "en_US.UTF-8"
+  keyboard:
+    layout: us
+  ssh:
+    install-server: false
+    authorized-keys: []
+    allow-pw: true
+  timezone: Europe/Amsterdam
+  apt:
+    preserve_sources_list: false
+    mirror-selection:
+      primary:
+        - country-mirror
+        - uri: "http://archive.ubuntu.com/ubuntu"
+          arches: [i386, amd64]
+        - uri: "http://ports.ubuntu.com/ubuntu-ports"
+          arches: [s390x, arm64, armhf, powerpc, ppc64el, riscv64]
+    fallback: offline-install
+    geoip: true
+  shutdown: reboot
