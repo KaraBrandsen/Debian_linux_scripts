@@ -159,6 +159,30 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
         apt install flatpak gnome-software-plugin-flatpak gnome-shell-extension-manager piper gir1.2-gtop-2.0 lm-sensors gnome-tweaks gparted -y
     fi
 
+    INTEL_GPU=$(lspci -k | grep -EA3 'VGA|3D|Display' | grep "Intel" | xargs)
+        
+    if [ "$INTEL_GPU" != "" ]; then
+        DISTRO=$(lsb_release -i | grep "Distributor" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
+
+        if [ "$DISTRO" == "Ubuntu" ]; then
+            VERSION=$(lsb_release -r | grep "Release" | cut -d ':' -f 2 | xargs)
+
+            echo Intel GPU detected on $DISTRO $VERSION
+
+            if [ "$VERSION" == "22.04" ]; then
+                wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
+                echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | tee /etc/apt/sources.list.d/intel-gpu-jammy.list
+                apt update
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-22.04
+            elif [ "$VERSION" == "24.04" ]; then
+                wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
+                echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" | tee /etc/apt/sources.list.d/intel-gpu-noble.list
+                sudo apt update
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-24.04
+            fi
+        fi
+    fi
+
     snap refresh
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo 
 
@@ -1261,6 +1285,30 @@ fi
 #Plex Media Server
 if [ "$INSTALL_PLEX_SERVER" == "true" ] ; then
     echo "-----------------------------Installing Plex-----------------------------"
+
+    INTEL_GPU=$(lspci -k | grep -EA3 'VGA|3D|Display' | grep "Intel" | xargs)
+        
+    if [ "$INTEL_GPU" != "" ]; then
+        DISTRO=$(lsb_release -i | grep "Distributor" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
+
+        if [ "$DISTRO" == "Ubuntu" ]; then
+            VERSION=$(lsb_release -r | grep "Release" | cut -d ':' -f 2 | xargs)
+
+            echo Intel GPU detected on $DISTRO $VERSION
+
+            if [ "$VERSION" == "22.04" ]; then
+                wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
+                echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | tee /etc/apt/sources.list.d/intel-gpu-jammy.list
+                apt update
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-22.04
+            elif [ "$VERSION" == "24.04" ]; then
+                wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
+                echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" | tee /etc/apt/sources.list.d/intel-gpu-noble.list
+                sudo apt update
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-24.04
+            fi
+        fi
+    fi
 
     curl -s https://downloads.plex.tv/plex-keys/PlexSign.key | apt-key add -
     echo deb https://downloads.plex.tv/repo/deb public main | tee /etc/apt/sources.list.d/plexmediaserver.list
