@@ -6,6 +6,7 @@ source "secrets.sh"
 #Then run one of the following
 #sudo ./setup.sh 
 #sudo ./setup.sh desktop
+#sudo ./setup.sh media
 #sudo ./setup.sh nas
 #sudo ./setup.sh pihole
 
@@ -33,12 +34,12 @@ source "secrets.sh"
         
     #Sonarr
         SONARR_PORT=8083                                        #Port Sonarr should be served on
-        SONARR_ROOT_FOLDER=("/mnt/nas/series")                  #Folders to where you want to store series (Can already contain a few)
+        SONARR_ROOT_FOLDER=("/mnt/nas/Series")                  #Folders to where you want to store series (Can already contain a few)
         INDEXERS=$INDEXERS                                      #Indexer details in JSON format. Can be multiple indexers.
         
     #Radarr
         RADARR_PORT=8084                                        #Port Radarr should be served on
-        RADARR_ROOT_FOLDER=("/mnt/nas/movies")                  #Folders to where you want to store movies (Can already contain a few)
+        RADARR_ROOT_FOLDER=("/mnt/nas/Movies")                  #Folders to where you want to store movies (Can already contain a few)
 
     #Shares
         WIN_HOST=$WIN_HOST                                      #IP address of the windows host 
@@ -432,7 +433,7 @@ if [ "$INSTALL_FILE_SERVER" == "true" ] ; then
         echo "No HDD configured using default options"
         echo "Seaching for suitable drives..."
 
-        ls /dev/disk/by-id | grep -v "part\|DVD\|CD" | grep "ata\|usb\|nvme" | while read -r DRIVE ; do
+        ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme\|scsi" | while read -r DRIVE ; do
             echo "Found Drive: $DRIVE"
 
             PARTITIONS=$(ls /dev/disk/by-id | grep "$DRIVE-part1")
@@ -522,7 +523,12 @@ EOF
             echo "Detected new disk: $FSNAME with partition type: $FSTYPE"
 
             mkdir -p /mnt/disk$COUNTER
-            echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults 0 0" >> /etc/fstab
+            if [ "$FSTYPE" == "ntfs" ]; then
+                echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,permissions 0 0" >> /etc/fstab
+            else
+                echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail 0 0" >> /etc/fstab
+            fi
+
             mount /dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER
             COUNTER=$[ $COUNTER + 1 ]
         done
@@ -536,9 +542,13 @@ EOF
         else
             mkdir -p /mnt/$MERGERFS_DIR
 
-            echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs 0 0" >> /etc/fstab
-            mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
+            echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs 0 0" >> /etc/fstab
+            mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
         fi
+
+        chown -R $APP_UID:$APP_GUID /mnt/$MERGERFS_DIR
+        echo "Created /mnt/$MERGERFS_DIR using mergerfs."
+        echo "Creating SAMBA Shares:"
 
         if grep -F "comment = MergerFS Share" /etc/samba/smb.conf ; then
             echo "Share Already Exists"
@@ -1218,7 +1228,7 @@ EOF
         echo "Setting more sensible quality values"
         QUALITIES=$(curl -s -H "Content-Type: application/json" -H "X-Api-Key: $RADARR_APIKEY" -H "accept: application/json" -X GET "http://$IP_LOCAL:$RADARR_PORT/api/v3/qualitydefinition")
 
-        QUALITY_MAP='{"Unknown":{"minSize":0,"maxSize":50,"preferredSize":20},"WORKPRINT":{"minSize":0,"maxSize":50,"preferredSize":20},"CAM":{"minSize":0,"maxSize":50,"preferredSize":20},"TELESYNC":{"minSize":0,"maxSize":50,"preferredSize":20},"TELECINE":{"minSize":0,"maxSize":50,"preferredSize":20},"REGIONAL":{"minSize":0,"maxSize":50,"preferredSize":20},"DVDSCR":{"minSize":0,"maxSize":50,"preferredSize":20},"SDTV":{"minSize":0,"maxSize":50,"preferredSize":20},"DVD":{"minSize":0,"maxSize":50,"preferredSize":20},"DVD-R":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-480p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-480p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-480p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-576p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Remux-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBDL-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBRip-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Bluray-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Remux-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"BR-DISK":{"minSize":0,"maxSize":80,"preferredSize":20},"Raw-HD":{"minSize":0,"maxSize":80,"preferredSize":20}}'
+        QUALITY_MAP='{"Unknown":{"minSize":0,"maxSize":25,"preferredSize":20},"WORKPRINT":{"minSize":0,"maxSize":25,"preferredSize":20},"CAM":{"minSize":0,"maxSize":25,"preferredSize":20},"TELESYNC":{"minSize":0,"maxSize":25,"preferredSize":20},"TELECINE":{"minSize":0,"maxSize":25,"preferredSize":20},"REGIONAL":{"minSize":0,"maxSize":25,"preferredSize":20},"DVDSCR":{"minSize":0,"maxSize":25,"preferredSize":20},"SDTV":{"minSize":0,"maxSize":25,"preferredSize":20},"DVD":{"minSize":0,"maxSize":25,"preferredSize":20},"DVD-R":{"minSize":0,"maxSize":25,"preferredSize":20},"WEBDL-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"WEBRip-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"Bluray-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"Bluray-576p":{"minSize":0,"maxSize":25,"preferredSize":20},"HDTV-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Remux-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBDL-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBRip-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Bluray-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Remux-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"BR-DISK":{"minSize":0,"maxSize":80,"preferredSize":20},"Raw-HD":{"minSize":0,"maxSize":80,"preferredSize":20}}'
         NUM_QUALITIES=$(echo "$QUALITIES" | jq length)
 
         for ((i = 0; i < NUM_QUALITIES; i++)) ; do
