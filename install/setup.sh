@@ -449,7 +449,7 @@ if [ "$INSTALL_FILE_SERVER" == "true" ] ; then
     echo "-----------------------------Installing MergerFS-----------------------------"
 
     echo "Setting up Shared Folders"
-    apt install samba mergerfs -y
+    apt install samba mergerfs smartmontools -y
 
     #TODO: Fix usb hdd detection
 
