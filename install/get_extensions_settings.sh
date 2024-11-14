@@ -40,7 +40,7 @@ rm temp.txt
 echo ""
 echo "Done"
 echo ""
-echo "Paste this line in the installation script"
+echo "Paste the line below in the installation script next to EXTENSION_SETTINGS="
 echo ""
 echo "$EXTENSION_SETTINGS"
 echo ""

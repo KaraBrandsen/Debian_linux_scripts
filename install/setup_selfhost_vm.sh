@@ -3,7 +3,6 @@ source "secrets.sh"
 
 ZT_TOKEN=$ZT_TOKEN	 	              
 NWID=$NWID
-HOST="GCP-Instance"
 DUCK_DNS_KEY=$DUCK_DNS_KEY
 KUMA_USER=$KUMA_USER
 KUMA_PASS=$KUMA_PASS
@@ -108,4 +107,3 @@ echo "Public Key: "
 echo ""
 cat ./id_ed25519.pub
 echo ""
-
