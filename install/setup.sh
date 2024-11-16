@@ -115,6 +115,18 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
 
+    echo "Applying fix for inconsistent file system prompt"
+    DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
+
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]]; then
+        echo "No modification of Grub needed"
+    else
+        echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
+        NEW_CONFIG="${DEFAULT_CONFIG::-1}  fsck.mode=force  fsck.repair=yes\""
+        sed -i "s/$DEFAULT_CONFIG/$NEW_CONFIG/" "/etc/default/grub"
+        update-grub
+    fi
+
     apt install sqlite3 -y
 fi
 
@@ -134,6 +146,18 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
+
+    echo "Applying fix for inconsistent file system prompt"
+    DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
+
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]]; then
+        echo "No modification of Grub needed"
+    else
+        echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
+        NEW_CONFIG="${DEFAULT_CONFIG::-1}  fsck.mode=force  fsck.repair=yes\""
+        sed -i "s/$DEFAULT_CONFIG/$NEW_CONFIG/" "/etc/default/grub"
+        update-grub
+    fi
 fi
 
 if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
@@ -1531,11 +1555,11 @@ if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
 
     echo "Installing RustDesk"
     if [ "${ID}" = "debian" ] || [ "$OS" = "Ubuntu" ] || [ "$OS" = "Debian" ] || [ "${UPSTREAM_ID}" = "ubuntu" ] || [ "${UPSTREAM_ID}" = "debian" ]; then
-        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.6/rustdesk-1.2.6-x86_64.deb
-        apt-get install -fy ./rustdesk-1.2.6-x86_64.deb > null
+        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.6/rustdesk-1.3.2-x86_64.deb
+        apt-get install -fy ./rustdesk-1.3.2-x86_64.deb > null
     elif [ "$OS" = "CentOS" ] || [ "$OS" = "RedHat" ] || [ "$OS" = "Fedora Linux" ] || [ "${UPSTREAM_ID}" = "rhel" ] || [ "$OS" = "Almalinux" ] || [ "$OS" = "Rocky*" ] ; then
-        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.6/rustdesk-1.2.6-0.x86_64.rpm
-        yum localinstall ./rustdesk-1.2.6-0.x86_64.rpm -y > null
+        wget https://github.com/rustdesk/rustdesk/releases/download/1.2.6/rustdesk-1.3.2-0.x86_64.rpm
+        yum localinstall ./rustdesk-1.3.2-0.x86_64.rpm -y > null
     else
         echo "Unsupported OS"
         exit 1
