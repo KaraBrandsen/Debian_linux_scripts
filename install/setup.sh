@@ -118,7 +118,7 @@ if [ "$ARG" == "nas" ]; then
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
-    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]]; then
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" != "" ]; then
         echo "No modification of Grub needed"
     else
         echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
@@ -150,7 +150,7 @@ if [ "$ARG" == "pihole" ]; then
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
-    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]]; then
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" != "" ]; then
         echo "No modification of Grub needed"
     else
         echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
