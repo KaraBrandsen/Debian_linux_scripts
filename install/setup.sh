@@ -1511,25 +1511,13 @@ if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
     echo "-----------------------------Installing Rustdesk Client-----------------------------"
     apt install xserver-xorg-video-all -y
 
-    echo "Installing RustDesk"
-
     wget https://github.com/rustdesk/rustdesk/releases/download/1.3.2/rustdesk-1.3.2-x86_64.deb
     apt-get install -fy ./rustdesk-1.3.2-x86_64.deb > null
-
-    # Run the rustdesk command with --get-id and store the output in the rustdesk_id variable
-    rustdesk_id=$(rustdesk --get-id)
 
     # Apply new password to RustDesk
     rustdesk --password $RUSTDESK_PASS &> /dev/null
     rustdesk --config $RUSTDESK_CFG
     systemctl restart rustdesk
-
-    # Check if the rustdesk_id is not empty
-    if [ -n "$rustdesk_id" ]; then
-        echo "RustDesk ID: $rustdesk_id"
-    else
-        echo "Failed to get RustDesk ID."
-    fi
 
     sed -i "s/#WaylandEnable=false/WaylandEnable=false/" "/etc/gdm3/custom.conf"
     echo "Installed Rustdesk Client"
@@ -1615,4 +1603,9 @@ fi
 if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     echo "Shell Extensions: "
     echo "  You will need to reboot for changes to take effect"
+fi
+
+if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
+    echo "Rust Desk: "
+    echo "  You will need to reboot before you will be able to connect"
 fi
