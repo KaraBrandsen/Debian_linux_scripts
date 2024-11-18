@@ -118,7 +118,7 @@ if [ "$ARG" == "nas" ]; then
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
-    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" != "" ]; then
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" == "" ]; then
         echo "No modification of Grub needed"
     else
         echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
@@ -150,7 +150,7 @@ if [ "$ARG" == "pihole" ]; then
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
-    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" != "" ]; then
+    if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" == "" ] ; then
         echo "No modification of Grub needed"
     else
         echo "Forcing Grub to disk check and repair if the system was not rebooted properly"
@@ -234,7 +234,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     fi
 fi 
 
-apt install curl nano jq rsyslog whois build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
+apt install curl nano jq cron rsyslog whois build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
 
 #Constants
 APP_UID=$SUDO_USER
@@ -503,7 +503,7 @@ if [ "$INSTALL_FILE_SERVER" == "true" ] ; then
                 else
                     echo "  Found Partition: $PARTITION mounted at $MOUNT_POINT"
 
-                    if [ "$MOUNT_POINT" = "/" ] || [[ "$MOUNT_POINT" = "/var/"* ]] || [[ "$MOUNT_POINT" = "/boot/"* ]] || [[ "$MOUNT_POINT" = "/root/"* ]] || [[ "$MOUNT_POINT" = *"/snap/"* ]]; then
+                    if [ "$MOUNT_POINT" = "/" ] || [[ "$MOUNT_POINT" = "/var/"* ]] || [[ "$MOUNT_POINT" = "/boot/"* ]] || [[ "$MOUNT_POINT" = "/root/"* ]] || [[ "$MOUNT_POINT" = *"/snap/"* ]] || [[ "$MOUNT_POINT" = *"/run/"* ]] || [[ "$MOUNT_POINT" = *"/dev/"* ]] || [[ "$MOUNT_POINT" = *"/sys/"* ]]; then
                         echo "      Partition mounted on root: skipping"
                     else
 
