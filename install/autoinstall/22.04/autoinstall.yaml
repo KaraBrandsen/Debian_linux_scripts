@@ -19,7 +19,7 @@ locale: "en_US.UTF-8"
 keyboard:
   layout: us
 ssh:
-  install-server: false
+  install-server: true
   authorized-keys: []
   allow-pw: true
 timezone: Europe/Amsterdam

@@ -12,15 +12,15 @@ autoinstall:
     layout:
       name: direct
   identity:
-    realname: 'User'
-    hostname: user-server
+    realname: 'Kara'
+    hostname: kara-server
     password: "Run mkpasswd -m sha-512 ubuntupass"
-    username: user
+    username: kara
   locale: "en_US.UTF-8"
   keyboard:
     layout: us
   ssh:
-    install-server: false
+    install-server: true
     authorized-keys: []
     allow-pw: true
   timezone: Europe/Amsterdam
@@ -38,7 +38,7 @@ autoinstall:
   late-commands:
     - curtin in-target -- apt-get update
     - curtin in-target -- apt-get install -y curl git nano
-    - curtin in-target -- git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git /home/kara/
+    - curtin in-target -- git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git /home/kara/Debian_linux_scripts
     - curtin in-target -- cp /home/kara/Debian_linux_scripts/install/setup.sh /kara/User/
     - curtin in-target -- chmod +x /home/kara/setup.sh
     - curtin in-target -- wget <uri> -O /home/kara/secrets.sh
