@@ -115,6 +115,18 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
 
+    DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
+    SDHCI_CONTROLLER=$(lspci | grep "SD Host")
+
+    if [[ $DEFAULT_CONFIG == *"sdhci.debug_quirks"* ]] || [ $SDHCI_CONTROLLER == "" ] || [ "$DEFAULT_CONFIG" == "" ]; then
+        echo "No modification of Grub needed"
+    else
+        echo "Forcing NCQ disabled for eMMC devices"
+        NEW_CONFIG="${DEFAULT_CONFIG::-1}  sdhci.debug_quirks=0x20000\""
+        sed -i "s/$DEFAULT_CONFIG/$NEW_CONFIG/" "/etc/default/grub"
+        update-grub
+    fi
+
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
