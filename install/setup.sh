@@ -584,7 +584,7 @@ EOF
 
             mkdir -p /mnt/disk$COUNTER
             if [ "$FSTYPE" == "ntfs" ]; then
-                echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,permissions 0 0" >> /etc/fstab
+                echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,gid=$APP_GUID,uid=$APP_UID,umask=000,dmask=000,fmask=000 0 0" >> /etc/fstab
             else
                 echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail 0 0" >> /etc/fstab
             fi
@@ -606,6 +606,14 @@ EOF
             mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
         fi
 
+        if [ "$REMOTE_USER" == "default" ]; then
+            REMOTE_USER=$SUDO_USER
+        else
+            useradd -r $REMOTE_USER
+            sleep 1
+            echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | passwd -q $REMOTE_USER
+        fi
+
         chown -R $APP_UID:$APP_GUID /mnt/$MERGERFS_DIR
         echo "Created /mnt/$MERGERFS_DIR using mergerfs."
         echo "Creating SAMBA Shares:"
@@ -618,16 +626,12 @@ EOF
             echo "    path = /mnt/$MERGERFS_DIR" >> /etc/samba/smb.conf
             echo "    read only = $READ_ONLY_SHARES" >> /etc/samba/smb.conf
             echo "    browsable = yes" >> /etc/samba/smb.conf
+            echo "    force user = $APP_UID" >> /etc/samba/smb.conf
+            echo "    force group = $APP_GUID" >> /etc/samba/smb.conf
+            echo "    create mask = 777" >> /etc/samba/smb.conf
+            echo "    directory mask = 777" >> /etc/samba/smb.conf
 
             service smbd restart
-
-            if [ "$REMOTE_USER" == "default" ]; then
-                REMOTE_USER=$SUDO_USER
-            fi
-
-            useradd -r $REMOTE_USER
-            sleep 1
-            echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | passwd -q $REMOTE_USER
             echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | smbpasswd -a -s $REMOTE_USER
         fi
         SMB_URL="smb://$IP_LOCAL/$MERGERFS_DIR"
