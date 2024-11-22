@@ -263,6 +263,12 @@ if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     fi
 fi
 
+if grep -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf ; then
+    echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+    echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+    echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+fi
+
 #Zerotier Setup
 if [ "$INSTALL_ZEROTIER" == "true" ] || [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
     echo "-----------------------------Installing Zerotier-----------------------------"
@@ -1143,6 +1149,7 @@ EOF
         echo "${app^} failed to start"
     fi
 
+    rm -f "${app^}".*.tar.gz
     echo "Installled Sonarr"
 fi
 
@@ -1319,6 +1326,8 @@ EOF
     else
         echo "${app^} failed to start"
     fi
+
+    rm -f "${app^}".*.tar.gz
     echo "Installled Radarr"
 fi
 
