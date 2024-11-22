@@ -267,6 +267,7 @@ if grep -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf ; then
     echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
     echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
     echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
+    sysctl -p
 fi
 
 #Zerotier Setup
@@ -1118,7 +1119,7 @@ EOF
         echo "Setting more sensible quality values"
         QUALITIES=$(curl -s -H "Content-Type: application/json" -H "X-Api-Key: $SONARR_APIKEY" -H "accept: application/json" -X GET "http://$IP_LOCAL:$SONARR_PORT/api/v3/qualitydefinition")
 
-        QUALITY_MAP='{"Unknown":{"minSize":1,"maxSize":50,"preferredSize":20},"SDTV":{"minSize":2,"maxSize":50,"preferredSize":20},"WEBRip-480p":{"minSize":2,"maxSize":50,"preferredSize":20},"WEBDL-480p":{"minSize":2,"maxSize":50,"preferredSize":20},"DVD":{"minSize":2,"maxSize":50,"preferredSize":20},"Bluray-480p":{"minSize":2,"maxSize":50,"preferredSize":20},"HDTV-720p":{"minSize":3,"maxSize":50,"preferredSize":20},"HDTV-1080p":{"minSize":4,"maxSize":50,"preferredSize":20},"Raw-HD":{"minSize":4,"maxSize":50,"preferredSize":20},"WEBRip-720p":{"minSize":3,"maxSize":50,"preferredSize":20},"WEBDL-720p":{"minSize":3,"maxSize":50,"preferredSize":20},"Bluray-720p":{"minSize":4,"maxSize":50,"preferredSize":20},"WEBRip-1080p":{"minSize":4,"maxSize":50,"preferredSize":20},"WEBDL-1080p":{"minSize":4,"maxSize":50,"preferredSize":20},"Bluray-1080p":{"minSize":4,"maxSize":50,"preferredSize":20},"Bluray-1080p Remux":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"WEBRip-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"WEBDL-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"Bluray-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"Bluray-2160p Remux":{"minSize":35,"maxSize":50,"preferredSize":35}}'
+        QUALITY_MAP='{"Unknown":{"minSize":1,"maxSize":25,"preferredSize":20},"SDTV":{"minSize":2,"maxSize":25,"preferredSize":20},"WEBRip-480p":{"minSize":2,"maxSize":25,"preferredSize":20},"WEBDL-480p":{"minSize":2,"maxSize":25,"preferredSize":20},"DVD":{"minSize":2,"maxSize":25,"preferredSize":20},"Bluray-480p":{"minSize":2,"maxSize":25,"preferredSize":20},"HDTV-720p":{"minSize":3,"maxSize":30,"preferredSize":20},"HDTV-1080p":{"minSize":4,"maxSize":35,"preferredSize":20},"Raw-HD":{"minSize":4,"maxSize":35,"preferredSize":20},"WEBRip-720p":{"minSize":3,"maxSize":30,"preferredSize":20},"WEBDL-720p":{"minSize":3,"maxSize":30,"preferredSize":20},"Bluray-720p":{"minSize":4,"maxSize":30,"preferredSize":20},"WEBRip-1080p":{"minSize":4,"maxSize":35,"preferredSize":20},"WEBDL-1080p":{"minSize":4,"maxSize":35,"preferredSize":20},"Bluray-1080p":{"minSize":4,"maxSize":35,"preferredSize":20},"Bluray-1080p Remux":{"minSize":0,"maxSize":35,"preferredSize":20},"HDTV-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"WEBRip-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"WEBDL-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"Bluray-2160p":{"minSize":35,"maxSize":50,"preferredSize":35},"Bluray-2160p Remux":{"minSize":35,"maxSize":50,"preferredSize":35}}'
         NUM_QUALITIES=$(echo "$QUALITIES" | jq length)
 
         for ((i = 0; i < NUM_QUALITIES; i++)) ; do
