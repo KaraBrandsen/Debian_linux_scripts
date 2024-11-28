@@ -246,7 +246,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     fi
 fi 
 
-apt install curl nano jq cron rsyslog whois build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
+apt install curl nano jq cron rsyslog whois figlet lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
 
 #Constants
 APP_UID=$SUDO_USER
