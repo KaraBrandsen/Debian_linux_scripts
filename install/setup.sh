@@ -246,7 +246,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     fi
 fi 
 
-apt install curl nano jq cron rsyslog whois figlet lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools -y
+apt install curl nano jq cron rsyslog whois figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates -y
 
 #Constants
 APP_UID=$SUDO_USER
@@ -378,7 +378,8 @@ fi
 if [ "$INSTALL_HASS" == "true" ] ; then
     echo "-----------------------------Installing Home Assistant-----------------------------"
 
-    apt-get install -y python3 python3-dev python3-venv python3-pip bluez libffi-dev libssl-dev libjpeg-dev zlib1g-dev autoconf build-essential libopenjp2-7 libtiff6 libturbojpeg0-dev tzdata ffmpeg liblapack3 liblapack-dev libatlas-base-dev
+    add-apt-repository ppa:mosquitto-dev/mosquitto-ppa -y
+    apt install -y python3 python3-dev python3-venv python3-pip bluez libffi-dev libssl-dev libjpeg-dev zlib1g-dev autoconf build-essential libopenjp2-7 libtiff6 libturbojpeg0-dev tzdata ffmpeg liblapack3 liblapack-dev libatlas-base-dev mosquitto mosquitto-clients
 
     useradd -r -m homeassistant
 
@@ -398,24 +399,29 @@ if [ "$INSTALL_HASS" == "true" ] ; then
 
     sudo -u homeassistant -H -s /srv/homeassistant/Install_HAS.sh 
     
-    echo [Unit] > /etc/systemd/system/home-assistant@homeassistant.service
-    echo Description=Home Assistant >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo After=network-online.target >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo " " >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo [Service] >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo Type=simple >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo User=%i >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo WorkingDirectory=/home/%i/.homeassistant >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo ExecStart=/srv/homeassistant/bin/hass -c "/home/%i/.homeassistant" >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo Environment="PATH=/srv/homeassistant/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/homeassistant/.local/bin" >>  /etc/systemd/system/home-assistant@homeassistant.service
-    echo RestartForceExitStatus=100 >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo " " >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo [Install] >> /etc/systemd/system/home-assistant@homeassistant.service
-    echo WantedBy=multi-user.target >> /etc/systemd/system/home-assistant@homeassistant.service
+    echo [Unit] > /etc/systemd/system/home-assistant.service
+    echo Description=Home Assistant >> /etc/systemd/system/home-assistant.service
+    echo After=network-online.target >> /etc/systemd/system/home-assistant.service
+    echo " " >> /etc/systemd/system/home-assistant.service
+    echo [Service] >> /etc/systemd/system/home-assistant.service
+    echo Type=simple >> /etc/systemd/system/home-assistant.service
+    echo User=homeassistant >> /etc/systemd/system/home-assistant.service
+    echo WorkingDirectory=/home/homeassistant/.homeassistant >> /etc/systemd/system/home-assistant.service
+    echo ExecStart=/srv/homeassistant/bin/hass -c "/home/homeassistant/.homeassistant" >> /etc/systemd/system/home-assistant.service
+    echo Environment="PATH=/srv/homeassistant/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/homeassistant/.local/bin" >>  /etc/systemd/system/home-assistant.service
+    echo RestartForceExitStatus=100 >> /etc/systemd/system/home-assistant.service
+    echo " " >> /etc/systemd/system/home-assistant.service
+    echo [Install] >> /etc/systemd/system/home-assistant.service
+    echo WantedBy=multi-user.target >> /etc/systemd/system/home-assistant.service
+
+    echo " " >> /etc/mosquitto/mosquitto.conf
+    echo "listener 8888" >> /etc/mosquitto/mosquitto.conf
+    echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
     
     systemctl --system daemon-reload
-    systemctl enable home-assistant@homeassistant
-    systemctl start home-assistant@homeassistant
+    systemctl enable home-assistant
+    systemctl start home-assistant
+    systemctl restart mosquitto
 
     echo "Installled Home Assistant"
 fi
