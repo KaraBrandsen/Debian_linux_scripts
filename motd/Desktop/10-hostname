@@ -1,3 +1,4 @@
 #!/bin/bash
 
-/usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f
+out=/run/hostname_motd
+cat $out
