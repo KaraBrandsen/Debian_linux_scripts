@@ -246,6 +246,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     fi
 fi 
 
+#Installing Common Items
 apt install curl nano jq cron rsyslog whois figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates -y
 
 #Constants
@@ -263,6 +264,7 @@ if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     fi
 fi
 
+#Disabling IPv6
 if grep -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf ; then
     echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
     echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
@@ -426,6 +428,7 @@ if [ "$INSTALL_HASS" == "true" ] ; then
     echo "Installled Home Assistant"
 fi
 
+#Libre Speed Test
 if [ "$INSTALL_LIBRE_SPEEDTEST" == "true" ] ; then
     echo "-----------------------------Installing Libre Speed Test-----------------------------"
 
