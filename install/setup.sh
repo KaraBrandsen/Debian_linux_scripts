@@ -247,7 +247,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
 fi 
 
 #Installing Common Items
-apt install curl nano jq cron rsyslog whois figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates -y
+apt install curl nano jq cron rsyslog whois lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates -y
 
 #Constants
 APP_UID=$SUDO_USER
