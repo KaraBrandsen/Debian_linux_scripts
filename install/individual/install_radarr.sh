@@ -112,9 +112,36 @@ sleep 15
 
 STATUS="$(systemctl is-active "$app")"
 if [ "${STATUS}" = "active" ]; then
+    echo "Setting more sensible quality values"
+    QUALITIES=$(curl -s -H "Content-Type: application/json" -H "X-Api-Key: $RADARR_APIKEY" -H "accept: application/json" -X GET "http://$IP_LOCAL:$RADARR_PORT/api/v3/qualitydefinition")
+
+    QUALITY_MAP='{"Unknown":{"minSize":0,"maxSize":25,"preferredSize":20},"WORKPRINT":{"minSize":0,"maxSize":25,"preferredSize":20},"CAM":{"minSize":0,"maxSize":25,"preferredSize":20},"TELESYNC":{"minSize":0,"maxSize":25,"preferredSize":20},"TELECINE":{"minSize":0,"maxSize":25,"preferredSize":20},"REGIONAL":{"minSize":0,"maxSize":25,"preferredSize":20},"DVDSCR":{"minSize":0,"maxSize":25,"preferredSize":20},"SDTV":{"minSize":0,"maxSize":25,"preferredSize":20},"DVD":{"minSize":0,"maxSize":25,"preferredSize":20},"DVD-R":{"minSize":0,"maxSize":25,"preferredSize":20},"WEBDL-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"WEBRip-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"Bluray-480p":{"minSize":0,"maxSize":25,"preferredSize":20},"Bluray-576p":{"minSize":0,"maxSize":25,"preferredSize":20},"HDTV-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-720p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBDL-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"WEBRip-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Bluray-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"Remux-1080p":{"minSize":0,"maxSize":50,"preferredSize":20},"HDTV-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBDL-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"WEBRip-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Bluray-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"Remux-2160p":{"minSize":0,"maxSize":80,"preferredSize":20},"BR-DISK":{"minSize":0,"maxSize":80,"preferredSize":20},"Raw-HD":{"minSize":0,"maxSize":80,"preferredSize":20}}'
+    NUM_QUALITIES=$(echo "$QUALITIES" | jq length)
+
+    for ((i = 0; i < NUM_QUALITIES; i++)) ; do
+
+        QUALITY_NAME=$(echo $QUALITIES | jq ".[$i].title" ) 
+        QUALITY=$(echo $QUALITIES | jq ".[$i]" ) 
+
+        MINSIZE=$(echo $QUALITY_MAP | jq ".$QUALITY_NAME.minSize")  
+        MAXSIZE=$(echo $QUALITY_MAP | jq ".$QUALITY_NAME.maxSize")  
+        PREFSIZE=$(echo $QUALITY_MAP | jq ".$QUALITY_NAME.preferredSize")
+
+        if [ "$MINSIZE" != "null" ] ; then
+                QUALITY=$(echo $QUALITY | jq ".minSize=$MINSIZE | .maxSize=$MAXSIZE | .preferredSize=$PREFSIZE")
+        fi
+
+        curl -H "Content-Type: application/json" -H "X-Api-Key: $RADARR_APIKEY" -H "accept: application/json" -X PUT "http://$IP_LOCAL:$RADARR_PORT/api/v3/qualitydefinition" --data "${QUALITY}"
+    done
+
+    echo "Setting permissions settings"
+    curl -H "Content-Type: application/json" -H "X-Api-Key: $RADARR_APIKEY" -H "accept: application/json" -X PUT "http://$IP_LOCAL:$RADARR_PORT/api/v3/config/mediamanagement"  --data '{"autoUnmonitorPreviouslyDownloadedMovies":false,"recycleBin":"","recycleBinCleanupDays":7,"downloadPropersAndRepacks":"preferAndUpgrade","createEmptyMovieFolders":false,"deleteEmptyFolders":true,"fileDate":"none","rescanAfterRefresh":"always","autoRenameFolders":true,"pathsDefaultStatic":false,"setPermissionsLinux":true,"chmodFolder":"755","chownGroup":"'"$APP_GUID"'","skipFreeSpaceCheckWhenImporting":false,"minimumFreeSpaceWhenImporting":100,"copyUsingHardlinks":true,"useScriptImport":false,"scriptImportPath":"","importExtraFiles":true,"extraFileExtensions":"srt","enableMediaInfo":true,"id":1}'
+
     RADARR_URL="http://$IP_LOCAL:$app_port"
     echo "Browse to $RADARR_URL for the ${app^} GUI"
 else
     echo "${app^} failed to start"
 fi
+
+rm -f "${app^}".*.tar.gz
 echo "Installled Radarr"

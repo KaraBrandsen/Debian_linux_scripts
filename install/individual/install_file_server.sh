@@ -15,7 +15,7 @@ IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 echo "-----------------------------Installing MergerFS-----------------------------"
 
 echo "Setting up Shared Folders"
-apt install samba mergerfs ntfs-3g -y
+apt install samba mergerfs smartmontools ntfs-3g -y
 
 #TODO: Fix usb hdd detection
 
@@ -23,7 +23,7 @@ if [ ${#HDD_IDS[@]} -eq 0 ]; then
     echo "No HDD configured using default options"
     echo "Seaching for suitable drives..."
 
-    ls /dev/disk/by-id | grep -v "part\|DVD\|CD" | grep "ata\|usb\|nvme" | while read -r DRIVE ; do
+    ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme\|scsi" | while read -r DRIVE ; do
         echo "Found Drive: $DRIVE"
 
         PARTITIONS=$(ls /dev/disk/by-id | grep "$DRIVE-part1")
@@ -45,7 +45,7 @@ if [ ${#HDD_IDS[@]} -eq 0 ]; then
             else
                 echo "  Found Partition: $PARTITION mounted at $MOUNT_POINT"
 
-                if [ "$MOUNT_POINT" = "/" ] || [[ "$MOUNT_POINT" = "/var/"* ]] || [[ "$MOUNT_POINT" = "/boot/"* ]] || [[ "$MOUNT_POINT" = "/root/"* ]] || [[ "$MOUNT_POINT" = *"/snap/"* ]]; then
+                if [ "$MOUNT_POINT" = "/" ] || [[ "$MOUNT_POINT" = "/var/"* ]] || [[ "$MOUNT_POINT" = "/boot/"* ]] || [[ "$MOUNT_POINT" = "/root/"* ]] || [[ "$MOUNT_POINT" = *"/snap/"* ]] || [[ "$MOUNT_POINT" = *"/run/"* ]] || [[ "$MOUNT_POINT" = *"/dev/"* ]] || [[ "$MOUNT_POINT" = *"/sys/"* ]]; then
                     echo "      Partition mounted on root: skipping"
                 else
 
@@ -113,7 +113,12 @@ else
         echo "Detected new disk: $FSNAME with partition type: $FSTYPE"
 
         mkdir -p /mnt/disk$COUNTER
-        echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults 0 0" >> /etc/fstab
+        if [ "$FSTYPE" == "ntfs" ]; then
+            echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,gid=$APP_GUID,uid=$APP_UID,umask=000,dmask=000,fmask=000 0 0" >> /etc/fstab
+        else
+            echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail 0 0" >> /etc/fstab
+        fi
+
         mount /dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER
         COUNTER=$[ $COUNTER + 1 ]
     done
@@ -127,9 +132,21 @@ else
     else
         mkdir -p /mnt/$MERGERFS_DIR
 
-        echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs 0 0" >> /etc/fstab
-        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
+        echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs 0 0" >> /etc/fstab
+        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=20G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
     fi
+
+    if [ "$REMOTE_USER" == "default" ]; then
+        REMOTE_USER=$SUDO_USER
+    else
+        useradd -r $REMOTE_USER
+        sleep 1
+        echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | passwd -q $REMOTE_USER
+    fi
+
+    chown -R $APP_UID:$APP_GUID /mnt/$MERGERFS_DIR
+    echo "Created /mnt/$MERGERFS_DIR using mergerfs."
+    echo "Creating SAMBA Shares:"
 
     if grep -F "comment = MergerFS Share" /etc/samba/smb.conf ; then
         echo "Share Already Exists"
@@ -139,16 +156,12 @@ else
         echo "    path = /mnt/$MERGERFS_DIR" >> /etc/samba/smb.conf
         echo "    read only = $READ_ONLY_SHARES" >> /etc/samba/smb.conf
         echo "    browsable = yes" >> /etc/samba/smb.conf
+        echo "    force user = $APP_UID" >> /etc/samba/smb.conf
+        echo "    force group = $APP_GUID" >> /etc/samba/smb.conf
+        echo "    create mask = 777" >> /etc/samba/smb.conf
+        echo "    directory mask = 777" >> /etc/samba/smb.conf
 
         service smbd restart
-
-        if [ "$REMOTE_USER" == "default" ]; then
-            REMOTE_USER=$SUDO_USER
-        fi
-
-        useradd -r $REMOTE_USER
-        sleep 1
-        echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | passwd -q $REMOTE_USER
         echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | smbpasswd -a -s $REMOTE_USER
     fi
     SMB_URL="smb://$IP_LOCAL/$MERGERFS_DIR"

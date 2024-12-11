@@ -13,8 +13,6 @@ IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 
 echo "-----------------------------Installing SABNZBd-----------------------------"
 
-apt install software-properties-common -y
-
 add-apt-repository ppa:jcfp/nobetas -y
 apt-get update -y
 apt-get install sabnzbdplus -y

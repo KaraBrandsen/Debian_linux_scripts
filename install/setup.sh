@@ -114,6 +114,7 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
+    INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
     SDHCI_CONTROLLER=$(lspci | grep "SD Host")
@@ -158,6 +159,7 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
+    INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     echo "Applying fix for inconsistent file system prompt"
     DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
@@ -188,6 +190,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=true           #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=true            #Install Rustdesk Client - set to false to skip
+    INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     if ! command -v gnome-shell 2>&1 >/dev/null ; then
         apt install flatpak piper gir1.2-gtop-2.0 lm-sensors gparted -y
@@ -373,7 +376,7 @@ if [ "$INSTALL_PIHOLE" == "true" ] ; then
     chown -R www-data:www-data /var/log/lighttpd/
     service lighttpd restart
 
-    echo "Installled PiHole"
+    echo "Installed PiHole"
 fi
 
 #Home Assistant
@@ -1556,6 +1559,36 @@ if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
 
     sed -i "s/#WaylandEnable=false/WaylandEnable=false/" "/etc/gdm3/custom.conf"
     echo "Installed Rustdesk Client"
+fi
+
+#Install MOTD
+if [ "$INSTALL_CUSTOM_MOTD" == "true" ] ; then
+    rm /etc/update-motd.d/*
+
+    if [ ! -f "../motd/$ARG/10-hostname" ] ; then
+        if [ ! -f "./Debian_linux_scripts/motd/$ARG/10-hostname" ] ; then
+            git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git
+        fi
+
+        cp "./Debian_linux_scripts/motd/$ARG/*" /etc/update-motd.d
+    else
+        cp "../motd/$ARG/*" /etc/update-motd.d
+    fi
+
+    /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd
+    chmod +x -R /etc/update-motd.d/
+
+    #Installing Crontab
+    crontab -l > root_cron
+    if grep -F "/usr/bin/env figlet" root_cron ; then
+        echo "Existing Cron job found"
+    else
+        echo "0 */12 * * * /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd" >> root_cron
+        echo "@reboot /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd" >> root_cron
+    fi
+
+    crontab root_cron
+    rm root_cron
 fi
 
 echo "----------------------------------------------------------------------------------"

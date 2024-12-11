@@ -17,7 +17,7 @@ apt install gnome-menus dbus-x11 -y
 for i in "${EXTENSION_LIST[@]}" ; do
     EXTENSION_ID=$(curl -s $i | grep -oP 'data-uuid="\K[^"]+')
     SEARCH_ID=$(echo $EXTENSION_ID | cut -d '@' -f 1)
-    VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map | map(.pk) | max')
+    VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map."'$GNOME_VERSION'".pk')
 
     echo "Installing: $EXTENSION_ID"
 
