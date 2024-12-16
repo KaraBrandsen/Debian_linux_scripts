@@ -15,10 +15,11 @@ else
     cp "../motd/$ARG/*" /etc/update-motd.d
 fi
 
+echo Copying MOTD files.
 /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd
 chmod +x -R /etc/update-motd.d/
 
-#Installing Crontab
+echo Installing Crontab for long running commands.
 crontab -l > root_cron
 if grep -F "/usr/bin/env figlet" root_cron ; then
     echo "Existing Cron job found"
