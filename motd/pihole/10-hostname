@@ -1,4 +1,9 @@
 #!/bin/bash
 
 out=/run/hostname_motd
-cat $out
+
+if [ ! -f "$out" ] ; then
+    /usr/bin/env figlet "$(hostname)" -w 100
+else    
+    cat $out
+fi

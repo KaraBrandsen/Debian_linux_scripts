@@ -6,8 +6,6 @@ NUM_DISKS=$(echo "$DISKS" | jq length)
 OLD_DISK_DATA=()
 TIMESTAMP=$(date +%s)
 
-echo
-
 for ((i = 0; i < NUM_DISKS; i++)) ; do
     DISK=$(echo $DISKS | jq -r ".[$i].name")
     DISK_DATA=$(smartctl --all "/dev/${DISK}" --json)
@@ -65,6 +63,6 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
         fi
         
         TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].value')
-        echo "Disk: ${DISK}, ${STATUS}, ${STATE}"
+        echo "Disk: ${DISK} (${TEMP}), ${STATUS}, ${STATE}"
     fi
 done
