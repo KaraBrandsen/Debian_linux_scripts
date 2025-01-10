@@ -250,7 +250,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
 fi 
 
 #Installing Common Items
-apt install curl nano jq cron rsyslog whois iperf3 iputils-ping lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates traceroute -y
+apt install curl nano jq cron rsyslog whois iputils-ping nethogs lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates traceroute -y
 
 #Constants
 APP_UID=$SUDO_USER
@@ -512,7 +512,7 @@ if [ "$INSTALL_FILE_SERVER" == "true" ] ; then
         echo "No HDD configured using default options"
         echo "Seaching for suitable drives..."
 
-        ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme\|scsi" | while read -r DRIVE ; do
+        ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme" | while read -r DRIVE ; do
             echo "Found Drive: $DRIVE"
 
             PARTITIONS=$(ls /dev/disk/by-id | grep "$DRIVE-part1")
