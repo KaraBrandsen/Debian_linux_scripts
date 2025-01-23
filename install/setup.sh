@@ -212,12 +212,12 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
                 wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
                 echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu jammy client" | tee /etc/apt/sources.list.d/intel-gpu-jammy.list
                 apt update
-                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-22.04
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-22.04 intel-gpu-tools 
             elif [ "$VERSION" == "24.04" ]; then
                 wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --yes --dearmor --output /usr/share/keyrings/intel-graphics.gpg
                 echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" | tee /etc/apt/sources.list.d/intel-gpu-noble.list
                 sudo apt update
-                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-24.04
+                apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-24.04 intel-gpu-tools 
             fi
         fi
     fi
@@ -250,7 +250,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
 fi 
 
 #Installing Common Items
-apt install curl nano jq cron rsyslog whois iputils-ping nethogs lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common intel-gpu-tools apt-transport-https ca-certificates traceroute -y
+apt install curl nano jq cron rsyslog whois iputils-ping nethogs lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
 
 #Constants
 APP_UID=$SUDO_USER
@@ -299,6 +299,8 @@ fi
 if [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
     echo "-----------------------------Installing Zerotier Router-----------------------------"
 
+    apt-get -y install iptables-persistent
+
     if [ "$PHY_IFACE" == "default" ] ; then
         PHY_IFACE=$(ifconfig | grep -E 'eth|enp|end' | cut -d ":" -f 1 | cut -d " " -f 1 | xargs)
         echo "Detected Ethernet Connection: $PHY_IFACE"
@@ -340,7 +342,6 @@ if [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
     echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
     echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
 
-    apt-get -y install iptables-persistent
     bash -c iptables-save > /etc/iptables/rules.v4
 
     echo "Installled Zerotier Router"
