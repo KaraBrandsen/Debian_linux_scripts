@@ -299,7 +299,7 @@ fi
 if [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
     echo "-----------------------------Installing Zerotier Router-----------------------------"
 
-    apt-get -y install iptables-persistent
+    apt-get -y install iptables iptables-persistent
 
     if [ "$PHY_IFACE" == "default" ] ; then
         PHY_IFACE=$(ifconfig | grep -E 'eth|enp|end' | cut -d ":" -f 1 | cut -d " " -f 1 | xargs)
