@@ -269,6 +269,8 @@ fi
 
 #Disabling IPv6
 if grep -F "net.ipv6.conf.all.disable_ipv6 = 1" /etc/sysctl.conf ; then
+    echo "IPv6 already disabled"
+else
     echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
     echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
     echo "net.ipv6.conf.lo.disable_ipv6 = 1" >> /etc/sysctl.conf
@@ -421,9 +423,13 @@ if [ "$INSTALL_HASS" == "true" ] ; then
     echo [Install] >> /etc/systemd/system/home-assistant.service
     echo WantedBy=multi-user.target >> /etc/systemd/system/home-assistant.service
 
-    echo " " >> /etc/mosquitto/mosquitto.conf
-    echo "listener 8888" >> /etc/mosquitto/mosquitto.conf
-    echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
+    if grep -F "listener 8888" /etc/mosquitto/mosquitto.conf ; then
+        echo "Mosquito already configured"
+    else
+        echo " " >> /etc/mosquitto/mosquitto.conf
+        echo "listener 8888" >> /etc/mosquitto/mosquitto.conf
+        echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
+    fi
     
     systemctl --system daemon-reload
     systemctl enable home-assistant
@@ -701,6 +707,7 @@ EOF
     echo "Waiting for background processes"
     service sabnzbdplus stop
     systemctl daemon-reload
+    sleep 1
     service sabnzbdplus restart
     sleep 9
     service sabnzbdplus stop
@@ -865,6 +872,7 @@ EOF
 EOF
 
     systemctl daemon-reload
+    sleep 1
     systemctl restart deluged
 
     sleep 2
@@ -980,7 +988,9 @@ EOF
     sed -i "s/8112/$DELUGE_PORT/" /home/$APP_UID/.config/deluge/web.conf
 
     systemctl restart deluged
+    sleep 1
     systemctl restart deluge-web
+    sleep 1
     systemctl enable deluged
     systemctl enable deluge-web
 
@@ -1572,9 +1582,9 @@ if [ "$INSTALL_CUSTOM_MOTD" == "true" ] ; then
             git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git
         fi
 
-        cp "./Debian_linux_scripts/motd/$ARG/*" /etc/update-motd.d
+        cp ./Debian_linux_scripts/motd/$ARG/* /etc/update-motd.d
     else
-        cp "../motd/$ARG/*" /etc/update-motd.d
+        cp ../motd/$ARG/* /etc/update-motd.d
     fi
 
     /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd
