@@ -200,19 +200,7 @@ fi
 apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
 
 #Constants
-APP_UID=$SUDO_USER
-APP_GUID=users
-HOST=$(hostname -I)
-IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
-
-if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
-    if ! command -v gnome-shell 2>&1 >/dev/null ; then
-        echo "Gnome Shell could not be found. Not installing shell extensions."
-        INSTALL_SHELL_EXTENSIONS=false
-    else
-        GNOME_VERSION=$(gnome-shell --version | cut -d ' ' -f 3 | cut -d '.' -f 1)
-    fi
-fi
+source "./common/common_variables.sh"
 
 #Disabling IPv6
 source "../fixes/disable_ip_v6.sh"

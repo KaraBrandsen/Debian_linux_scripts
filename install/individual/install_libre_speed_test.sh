@@ -8,7 +8,8 @@ if [ ${SOURCED} -eq 0 ]; then
     LIBREST_PORT=8090                                       #Port used by Libre Speed Test
     
     #Common Scripts
-    source "../../fixes/disable_ip_v6.sh"
+    source "../common/disable_ip_v6.sh"
+    source "../common/common_variables.sh"
 fi
 
 

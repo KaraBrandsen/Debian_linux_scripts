@@ -9,10 +9,11 @@ if [ ${SOURCED} -eq 0 ]; then
 
     #Variables
     SET_AS_EXIT_NODE=false                                  #Use this instance as an exit node for internet traffic. Recommend only 1 exit node per Zerotier network
-    PHY_IFACE=default                                       #The physical interface to bind services to. Default auto detects 
-    HOST=$(hostname -I)
     VIA_IP=$(curl -s -H "Authorization: token $ZT_TOKEN" -X GET "https://api.zerotier.com/api/v1/network/$NWID/member/$MEMBER_ID" | jq '.config.ipAssignments[0]' | cut -d '"' -f2)
     ZT_IFACE=$(ifconfig | grep zt* | cut -d ":" -f 1 | head --lines 1)
+
+    #Common Scripts
+    source "../common/common_variables.sh"
 fi
 
 

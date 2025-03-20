@@ -5,7 +5,7 @@ ARG=${1:-"desktop"}
 echo "-----------------------------Installing MOTD Scripts-----------------------------"
 rm /etc/update-motd.d/*
 
-if [ ! -f "../motd/$ARG/10-hostname" ] ; then
+if [ ! -f "../../motd/$ARG/10-hostname" ] ; then
     if [ ! -f "./Debian_linux_scripts/motd/$ARG/10-hostname" ] ; then
         git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git
     fi

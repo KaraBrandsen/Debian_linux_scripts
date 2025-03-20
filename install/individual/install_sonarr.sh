@@ -9,12 +9,11 @@ if [ ${SOURCED} -eq 0 ]; then
     
     #Variables
     SONARR_PORT=8083
-    APP_UID=$SUDO_USER
-    APP_GUID=users
     SONARR_ROOT_FOLDER=("/mnt/nas/Series")
     
     #Common Scripts
-    source "../../fixes/disable_ip_v6.sh"
+    source "../common/disable_ip_v6.sh"
+    source "../common/common_variables.sh"
 fi
 
 HOST=$(hostname -I)

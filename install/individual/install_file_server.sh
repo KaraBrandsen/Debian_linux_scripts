@@ -12,14 +12,12 @@ if [ ${SOURCED} -eq 0 ]; then
     READ_ONLY_SHARES=no                                     #Should the shared folder be read-only
     
     #Common Scripts
-    source "../../fixes/disable_ip_v6.sh"
+    source "../common/disable_ip_v6.sh"
+    source "../common/common_variables.sh"
 fi
 
 REMOTE_USER=$SAMBA_USER                                 #User to use for the SAMBA share. You will connect with this user.
 REMOTE_PASS=$SAMBA_PASS                                 #The above user's password.
-
-HOST=$(hostname -I)
-IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 
 
 echo "-----------------------------Installing MergerFS-----------------------------"

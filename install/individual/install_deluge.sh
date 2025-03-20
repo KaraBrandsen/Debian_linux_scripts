@@ -10,11 +10,9 @@ if [ ${SOURCED} -eq 0 ]; then
     APP_GUID=users
 
     #Common Scripts
-    source "../../fixes/disable_ip_v6.sh"
+    source "../common/disable_ip_v6.sh"
+    source "../common/common_variables.sh"
 fi
-
-HOST=$(hostname -I)
-IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 
 
 echo "-----------------------------Installing Deluge-----------------------------"

@@ -8,13 +8,10 @@ if [ ${SOURCED} -eq 0 ]; then
 
     #Variables
     SABNZBD_PORT=8081                                       #Port SABNZBD should be served on
-    APP_UID=$SUDO_USER
-    APP_GUID=users
-    HOST=$(hostname -I)
-    IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
     
     #Common Scripts
-    source "../../fixes/disable_ip_v6.sh"
+    source "../common/disable_ip_v6.sh"
+    source "../common/common_variables.sh"
 fi
 
 SERVERS=$SERVERS                                        #News server details in JSON format. Can be multiple servers.
