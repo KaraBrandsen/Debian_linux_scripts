@@ -2,6 +2,7 @@
 
 echo "-----------------------------Installing Home Assistant-----------------------------"
 
+apt install -y python3-launchpadlib
 add-apt-repository ppa:mosquitto-dev/mosquitto-ppa -y
 apt install -y python3 python3-dev python3-venv python3-pip bluez libffi-dev libssl-dev libjpeg-dev zlib1g-dev autoconf build-essential libopenjp2-7 libtiff6 libturbojpeg0-dev tzdata ffmpeg liblapack3 liblapack-dev libatlas-base-dev mosquitto mosquitto-clients
 
@@ -38,9 +39,13 @@ echo " " >> /etc/systemd/system/home-assistant.service
 echo [Install] >> /etc/systemd/system/home-assistant.service
 echo WantedBy=multi-user.target >> /etc/systemd/system/home-assistant.service
 
-echo " " >> /etc/mosquitto/mosquitto.conf
-echo "listener 8888" >> /etc/mosquitto/mosquitto.conf
-echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
+if grep -F "listener 8888" /etc/mosquitto/mosquitto.conf ; then
+    echo "Mosquito already configured"
+else
+    echo " " >> /etc/mosquitto/mosquitto.conf
+    echo "listener 8888" >> /etc/mosquitto/mosquitto.conf
+    echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
+fi
 
 systemctl --system daemon-reload
 systemctl enable home-assistant

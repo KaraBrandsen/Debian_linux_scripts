@@ -1,5 +1,5 @@
 #!/bin/bash
-source "secrets.sh"
+source "../secrets.sh"
 
 #Variables
 WIN_HOST=$WIN_HOST                                      #IP address of the windows host 
@@ -10,7 +10,7 @@ WIN_PASS=$WIN_PASS                                      #Password used to access
 
 echo "-----------------------------Installing Windows Shares-----------------------------"
 
-apt install cifs-utils ntfs-3g -y
+apt install cifs-utils ntfs-3g-y
 
 for SHARE in ${WIN_SHARES[@]}; do
     mkdir -p /mnt/$SHARE

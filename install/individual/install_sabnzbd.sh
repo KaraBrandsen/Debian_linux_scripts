@@ -1,15 +1,24 @@
 #!/bin/bash
-source "secrets.sh"
+source "../secrets.sh"
 
-#Variables
-SABNZBD_PORT=8081                                       #Port SABNZBD should be served on
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Variables
+    SABNZBD_PORT=8081                                       #Port SABNZBD should be served on
+    APP_UID=$SUDO_USER
+    APP_GUID=users
+    HOST=$(hostname -I)
+    IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
+    
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
+
 SERVERS=$SERVERS                                        #News server details in JSON format. Can be multiple servers.
 
-
-APP_UID=$SUDO_USER
-APP_GUID=users
-HOST=$(hostname -I)
-IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 
 echo "-----------------------------Installing SABNZBd-----------------------------"
 
@@ -23,7 +32,7 @@ cat <<EOF | tee /etc/default/sabnzbdplus >/dev/null
 #
 # When SABnzbd+ is started using the init script, the
 # --daemon option is always used, and the program is
-# started under the account of $USER, as set below.
+# started under the account of $APP_UID, as set below.
 #
 # Each setting is marked either "required" or "optional";
 # leaving any required setting un-configured will cause
@@ -33,7 +42,7 @@ cat <<EOF | tee /etc/default/sabnzbdplus >/dev/null
 USER=$APP_UID
 
 # [optional] full path to the configuration file of your choice;
-#            otherwise, the default location (in $USER's home
+#            otherwise, the default location (in $APP_UID's home
 #            directory) is used:
 CONFIG=
 
@@ -48,6 +57,7 @@ EOF
 echo "Waiting for background processes"
 service sabnzbdplus stop
 systemctl daemon-reload
+sleep 1
 service sabnzbdplus restart
 sleep 9
 service sabnzbdplus stop

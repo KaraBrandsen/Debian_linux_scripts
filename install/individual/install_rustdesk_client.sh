@@ -1,5 +1,5 @@
 #!/bin/bash
-source "secrets.sh"
+source "../secrets.sh"
 
 #Variables
 RUSTDESK_PASS=$RUSTDESK_PASS                            #Rustdesk Client Password. Used to log into a device

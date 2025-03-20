@@ -1,11 +1,21 @@
 #!/bin/bash
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
-DELUGE_PORT=8112
-APP_UID=$SUDO_USER
-APP_GUID=users
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Variables
+    DELUGE_PORT=8082
+    APP_UID=$SUDO_USER
+    APP_GUID=users
+
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
 
 HOST=$(hostname -I)
 IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
+
 
 echo "-----------------------------Installing Deluge-----------------------------"
 
@@ -54,6 +64,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
+sleep 1
 systemctl restart deluged
 
 sleep 2
@@ -169,7 +180,9 @@ sleep 1
 sed -i "s/8112/$DELUGE_PORT/" /home/$APP_UID/.config/deluge/web.conf
 
 systemctl restart deluged
+sleep 1
 systemctl restart deluge-web
+sleep 1
 systemctl enable deluged
 systemctl enable deluge-web
 

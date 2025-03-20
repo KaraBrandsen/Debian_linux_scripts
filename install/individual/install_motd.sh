@@ -2,7 +2,7 @@
 
 ARG=${1:-"desktop"}   
 
-apt install lolcat figlet -y 
+echo "-----------------------------Installing MOTD Scripts-----------------------------"
 rm /etc/update-motd.d/*
 
 if [ ! -f "../motd/$ARG/10-hostname" ] ; then
@@ -10,9 +10,9 @@ if [ ! -f "../motd/$ARG/10-hostname" ] ; then
         git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git
     fi
 
-    cp "./Debian_linux_scripts/motd/$ARG/*" /etc/update-motd.d
+    cp ./Debian_linux_scripts/motd/$ARG/* /etc/update-motd.d
 else
-    cp "../motd/$ARG/*" /etc/update-motd.d
+    cp ../../motd/$ARG/* /etc/update-motd.d
 fi
 
 echo Copying MOTD files.

@@ -1,14 +1,23 @@
 #!/bin/bash
-source "secrets.sh"
+source "../secrets.sh"
+
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+    
+    #Variables
+    KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface
+    
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
 
 KUMA_USER=$KUMA_USER                                    #Username to be used for the Uptime Kuma Web Interface
 KUMA_PASS=$KUMA_PASS                                    #Password to be used for the Uptime Kuma Web Interface
-KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface
+
 
 echo "-----------------------------Installing Uptime Kuma-----------------------------"
-
-apt install curl -y
-
 
 LATEST_VERSION=$(curl -s -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/nvm-sh/nvm/releases | jq -r '.[0].tag_name')
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$LATEST_VERSION/install.sh | bash
@@ -42,6 +51,36 @@ echo "api = UptimeKumaApi(\"http://localhost:$KUMA_PORT\")" >> init.py
 echo "try:" >> init.py
 echo "  api.setup(\"$KUMA_USER\", \"$KUMA_PASS\")" >> init.py
 echo "  api.login(\"$KUMA_USER\", \"$KUMA_PASS\")" >> init.py
+
+if [ "$INSTALL_ZEROTIER" == "true" ] || [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.PING, name='Zerotier', hostname=\"192.168.194.1\")" >> init.py
+fi
+if [ "$INSTALL_PIHOLE" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='PiHole UI', url=\"http://localhost/admin\")" >> init.py
+    echo "  api.add_monitor(type=MonitorType.DNS, name='PiHole DNS', hostname=\"google.com\")" >> init.py
+fi
+if [ "$INSTALL_HASS" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Home Assistant', url=\"http://localhost:8123\")" >> init.py
+fi
+if [ "$INSTALL_LIBRE_SPEEDTEST" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Libre Speed Test', url=\"http://localhost:$LIBREST_PORT\")" >> init.py
+fi
+if [ "$INSTALL_SABNZBD" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='SABNZBd', url=\"http://localhost:$SABNZBD_PORT\")" >> init.py
+fi
+if [ "$INSTALL_DELUGE" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Deluge', url=\"http://localhost:$DELUGE_PORT\")" >> init.py
+fi
+if [ "$INSTALL_SONARR" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Sonarr', url=\"http://localhost:$SONARR_PORT\")" >> init.py
+fi
+if [ "$INSTALL_RADARR" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Radarr', url=\"http://localhost:$RADARR_PORT\")" >> init.py
+fi
+if [ "$INSTALL_PLEX_SERVER" == "true" ] ; then
+    echo "  api.add_monitor(type=MonitorType.HTTP, name='Plex', url=\"http://localhost:32400/web\")" >> init.py
+fi
+
 echo "  api.disconnect()" >> init.py
 echo "except:" >> init.py
 echo "  pass" >> init.py

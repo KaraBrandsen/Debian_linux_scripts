@@ -1,16 +1,26 @@
 #!/bin/bash
-source "secrets.sh"
+source "../secrets.sh"
 
-#Variables
-HDD_IDS=()                                              #The IDs of the HDD's you wan to add to the pool - Get from: ls -l /dev/disk/by-id
-MERGERFS_DIR="default"                                  #The directory name where the merged folder should be mounted
-READ_ONLY_SHARES=no                                     #Should the shared folder be read-only
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Variables
+    HDD_IDS=()                                              #The IDs of the HDD's you wan to add to the pool - Get from: ls -l /dev/disk/by-id
+    MERGERFS_DIR="default"                                  #The directory name where the merged folder should be mounted
+    READ_ONLY_SHARES=no                                     #Should the shared folder be read-only
+    
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
+
 REMOTE_USER=$SAMBA_USER                                 #User to use for the SAMBA share. You will connect with this user.
 REMOTE_PASS=$SAMBA_PASS                                 #The above user's password.
 
-
 HOST=$(hostname -I)
 IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
+
 
 echo "-----------------------------Installing MergerFS-----------------------------"
 
@@ -23,7 +33,7 @@ if [ ${#HDD_IDS[@]} -eq 0 ]; then
     echo "No HDD configured using default options"
     echo "Seaching for suitable drives..."
 
-    ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme\|scsi" | while read -r DRIVE ; do
+    ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme" | while read -r DRIVE ; do
         echo "Found Drive: $DRIVE"
 
         PARTITIONS=$(ls /dev/disk/by-id | grep "$DRIVE-part1")
@@ -114,7 +124,7 @@ else
 
         mkdir -p /mnt/disk$COUNTER
         if [ "$FSTYPE" == "ntfs" ]; then
-            echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,gid=$APP_GUID,uid=$APP_UID,umask=000,dmask=000,fmask=000 0 0" >> /etc/fstab
+            echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail,big_writes,gid=$APP_GUID,uid=$APP_UID,umask=000,dmask=000,fmask=000 0 0" >> /etc/fstab
         else
             echo "/dev/disk/by-id/$HDD_ID /mnt/disk$COUNTER   $FSTYPE defaults,nofail 0 0" >> /etc/fstab
         fi
@@ -133,7 +143,7 @@ else
         mkdir -p /mnt/$MERGERFS_DIR
 
         echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs 0 0" >> /etc/fstab
-        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
+        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=5G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
     fi
 
     if [ "$REMOTE_USER" == "default" ]; then

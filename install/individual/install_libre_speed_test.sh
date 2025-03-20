@@ -1,6 +1,15 @@
 #!/bin/bash
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
-LIBREST_PORT=8090                                       #Port used by Libre Speed Test
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Variables
+    LIBREST_PORT=8090                                       #Port used by Libre Speed Test
+    
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
 
 
 echo "-----------------------------Installing Libre Speed Test-----------------------------"

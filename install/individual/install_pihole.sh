@@ -1,12 +1,20 @@
 #!/bin/bash
 
-#Variables
-PHY_IFACE=default                                       #The physical interface to bind services to. Default auto detects 
-DNS_1=8.8.8.8                                           #DNS Server used by your ISP - Get this from ifconfig/connection properties on any PC or from your router. Leave as is to use Google's DNS server
-DNS_2=8.8.4.4                                           #DNS Server used by your ISP - Get this from ifconfig/connection properties on any PC or from your router. Leave as is to use Google's DNS server
-DNS_3=2001:4860:4860::8888                              #DNS Server used by your ISP - Leave as is if the ISP has not IPV6 DNS
-DNS_4=2001:4860:4860::8844                              #DNS Server used by your ISP - Leave as is if the ISP has not IPV6 DNS
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Variables
+    PHY_IFACE=default                                       #The physical interface to bind services to. Default auto detects 
+    DNS_1=8.8.8.8                                           #DNS Server used by your ISP - Get this from ifconfig/connection properties on any PC or from your router. Leave as is to use Google's DNS server
+    DNS_2=8.8.4.4                                           #DNS Server used by your ISP - Get this from ifconfig/connection properties on any PC or from your router. Leave as is to use Google's DNS server
+    DNS_3=2001:4860:4860::8888                              #DNS Server used by your ISP - Leave as is if the ISP has not IPV6 DNS
+    DNS_4=2001:4860:4860::8844                              #DNS Server used by your ISP - Leave as is if the ISP has not IPV6 DNS
+    
+    #Common Scripts
+    source "../fixes/disable_ip_v6.sh"
+fi
 
 echo "-----------------------------Installing PiHole-----------------------------"
 
