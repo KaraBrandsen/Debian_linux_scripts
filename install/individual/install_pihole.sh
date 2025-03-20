@@ -13,7 +13,7 @@ if [ ${SOURCED} -eq 0 ]; then
     DNS_4=2001:4860:4860::8844                              #DNS Server used by your ISP - Leave as is if the ISP has not IPV6 DNS
     
     #Common Scripts
-    source "../fixes/disable_ip_v6.sh"
+    source "../../fixes/disable_ip_v6.sh"
 fi
 
 echo "-----------------------------Installing PiHole-----------------------------"

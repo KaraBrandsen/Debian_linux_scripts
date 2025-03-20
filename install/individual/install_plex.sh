@@ -11,7 +11,7 @@ if [ ${SOURCED} -eq 0 ]; then
     IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
     
     #Common Scripts
-    source "../fixes/disable_ip_v6.sh"
+    source "../../fixes/disable_ip_v6.sh"
 fi
 
 

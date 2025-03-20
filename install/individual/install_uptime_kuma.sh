@@ -10,7 +10,7 @@ if [ ${SOURCED} -eq 0 ]; then
     KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface
     
     #Common Scripts
-    source "../fixes/disable_ip_v6.sh"
+    source "../../fixes/disable_ip_v6.sh"
 fi
 
 KUMA_USER=$KUMA_USER                                    #Username to be used for the Uptime Kuma Web Interface

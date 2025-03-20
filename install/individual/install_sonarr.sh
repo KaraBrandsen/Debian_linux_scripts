@@ -14,7 +14,7 @@ if [ ${SOURCED} -eq 0 ]; then
     SONARR_ROOT_FOLDER=("/mnt/nas/Series")
     
     #Common Scripts
-    source "../fixes/disable_ip_v6.sh"
+    source "../../fixes/disable_ip_v6.sh"
 fi
 
 HOST=$(hostname -I)
