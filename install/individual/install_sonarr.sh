@@ -15,9 +15,6 @@ if [ ${SOURCED} -eq 0 ]; then
     source "../common/common_variables.sh"
 fi
 
-HOST=$(hostname -I)
-IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
-
 
 echo "-----------------------------Installing Sonarr-----------------------------"
 set -euo pipefail

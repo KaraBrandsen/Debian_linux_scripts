@@ -23,7 +23,7 @@ zerotier-cli join $NWID
 MEMBER_ID=$(zerotier-cli info | cut -d " " -f 3)
 echo "Joined network: $NWID with member_id: $MEMBER_ID"
 
-curl -s -o /dev/null -H "Authorization: token $ZT_TOKEN" -X POST "https://api.zerotier.com/api/v1/network/$NWID/member/$MEMBER_ID" --data '{"config": {"authorized": true}, "name": "'"${HOST}"'"}'
+curl -s -o /dev/null -H "Authorization: token $ZT_TOKEN" -X POST "https://api.zerotier.com/api/v1/network/$NWID/member/$MEMBER_ID" --data '{"config": {"authorized": true}, "name": "'"${HOSTNAME}"'"}'
 
 sleep 5
 VIA_IP=$(curl -s -H "Authorization: token $ZT_TOKEN" -X GET "https://api.zerotier.com/api/v1/network/$NWID/member/$MEMBER_ID" | jq '.config.ipAssignments[0]' | cut -d '"' -f2)

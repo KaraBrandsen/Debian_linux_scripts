@@ -3,6 +3,7 @@
 APP_UID=$SUDO_USER
 APP_GUID=users
 HOST=$(hostname -I)
+HOSTNAME=$(hostname)
 IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
 
 if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
