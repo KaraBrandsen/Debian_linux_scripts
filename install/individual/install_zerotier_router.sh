@@ -1,5 +1,10 @@
 #!/bin/bash
-source "../secrets.sh"
+
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    source "../secrets.sh"
+fi
 
 ZT_TOKEN=$ZT_TOKEN                                      #Your Zerotier API Token - Get this from https://my.zerotier.com/account -> "new token"
 NWID=$NWID                                              #Your Zerotier Network ID - Get this from https://my.zerotier.com/

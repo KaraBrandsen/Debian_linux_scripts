@@ -1,5 +1,10 @@
 #!/bin/bash
-source "../secrets.sh"
+
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    source "../secrets.sh"
+fi
 
 #Variables
 RUSTDESK_PASS=$RUSTDESK_PASS                            #Rustdesk Client Password. Used to log into a device

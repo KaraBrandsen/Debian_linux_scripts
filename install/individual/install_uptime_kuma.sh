@@ -1,10 +1,10 @@
 #!/bin/bash
-source "../secrets.sh"
 
 (return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
+    source "../secrets.sh"
     
     #Variables
     KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface

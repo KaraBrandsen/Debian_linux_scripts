@@ -1,8 +1,8 @@
 #!/bin/bash
-source "../secrets.sh"
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
+    source "../secrets.sh"
 
     #Common Scripts
     source "../common/common_variables.sh"
