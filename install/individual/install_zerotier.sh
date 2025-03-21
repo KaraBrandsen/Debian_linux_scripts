@@ -1,5 +1,7 @@
 #!/bin/bash
 
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
     source "../secrets.sh"

@@ -203,7 +203,7 @@ apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lo
 source "./common/common_variables.sh"
 
 #Disabling IPv6
-source "../fixes/disable_ip_v6.sh"
+source "./common/disable_ip_v6.sh"
 
 #Zerotier Setup
 if [ "$INSTALL_ZEROTIER" == "true" ] || [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
