@@ -4,13 +4,13 @@
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
-    source "../setup.sh"
     
     #Variables
     SONARR_PORT=8083
     SONARR_ROOT_FOLDER=("/mnt/nas/Series")
     
     #Common Scripts
+    source "../setup.sh"
     source "../common/disable_ip_v6.sh"
     source "../common/common_variables.sh"
 fi

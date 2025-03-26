@@ -15,7 +15,7 @@ WIN_PASS=$WIN_PASS                                      #Password used to access
 
 echo "-----------------------------Installing Windows Shares-----------------------------"
 
-apt install cifs-utils ntfs-3g-y
+apt install cifs-utils ntfs-3g -y
 
 for SHARE in ${WIN_SHARES[@]}; do
     mkdir -p /mnt/$SHARE

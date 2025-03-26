@@ -4,9 +4,9 @@
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
-    source "../secrets.sh"
-
+    
     #Common Scripts
+    source "../secrets.sh"
     source "../common/common_variables.sh"
 fi
 

@@ -4,12 +4,13 @@
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
-    source "../secrets.sh"
+    
     
     #Variables
     KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface
     
     #Common Scripts
+    source "../secrets.sh"
     source "../common/disable_ip_v6.sh"
 fi
 

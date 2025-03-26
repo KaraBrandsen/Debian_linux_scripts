@@ -4,7 +4,6 @@
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"
-    source "../secrets.sh"
 
     #Variables
     HDD_IDS=()                                              #The IDs of the HDD's you wan to add to the pool - Get from: ls -l /dev/disk/by-id
@@ -12,6 +11,7 @@ if [ ${SOURCED} -eq 0 ]; then
     READ_ONLY_SHARES=no                                     #Should the shared folder be read-only
     
     #Common Scripts
+    source "../secrets.sh"
     source "../common/disable_ip_v6.sh"
     source "../common/common_variables.sh"
 fi
