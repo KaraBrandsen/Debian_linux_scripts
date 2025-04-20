@@ -197,7 +197,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
 fi 
 
 #Installing Common Items
-apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 lolcat build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
+apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
 
 #Constants
 source "./common/common_variables.sh"

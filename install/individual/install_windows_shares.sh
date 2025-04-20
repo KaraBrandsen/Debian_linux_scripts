@@ -11,6 +11,8 @@ WIN_HOST=$WIN_HOST                                      #IP address of the windo
 WIN_SHARES=$WIN_SHARES                                  #An array of the shared folders
 WIN_USER=$WIN_USER                                      #Username used to access the windows shares
 WIN_PASS=$WIN_PASS                                      #Password used to access the windows shares
+APP_UID=$SUDO_USER
+APP_GUID=users
 
 
 echo "-----------------------------Installing Windows Shares-----------------------------"

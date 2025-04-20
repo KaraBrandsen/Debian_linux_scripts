@@ -3,6 +3,8 @@
 ARG=${1:-"desktop"}   
 
 echo "-----------------------------Installing MOTD Scripts-----------------------------"
+apt install lolcat figlet -y
+
 rm /etc/update-motd.d/*
 
 if [ ! -f "../../motd/$ARG/10-hostname" ] ; then
