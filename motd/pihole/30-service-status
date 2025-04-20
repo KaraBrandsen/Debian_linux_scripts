@@ -7,7 +7,7 @@ green="\e[1;32m"
 red="\e[1;31m"
 undim="\e[0m"
 
-services=("zerotier-one" "home-assistant" "nginx" "lighttpd" "pihole-FTL" "mosquitto")
+services=("zerotier-one" "home-assistant" "nginx" "pihole-FTL" "mosquitto")
 # sort services
 IFS=$'\n' services=($(sort <<<"${services[*]}"))
 unset IFS

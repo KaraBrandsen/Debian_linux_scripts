@@ -35,7 +35,7 @@ for line in "${dfs[@]}"; do
     for ((i=0; i<$used_width; i++)); do
         bar+="="
     done
-    # print dimmmed bar until end
+    # print dimmed bar until end
     bar+="${white}${dim}"
     for ((i=$used_width; i<$bar_width; i++)); do
         bar+="="

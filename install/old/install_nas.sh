@@ -20,7 +20,7 @@ source "secrets.sh"
     
     #MergerFS
         HDD_IDS=()                                              #The IDs of the HDD's you wan to add to the pool - Get from: ls -l /dev/disk/by-id
-        MERGERFS_DIR="default"                                  #The directory name where the merged forlder should be mounted
+        MERGERFS_DIR="default"                                  #The directory name where the merged folder should be mounted
         READ_ONLY_SHARES=no                                     #Should the shared folder be read-only
         REMOTE_USER=$SAMBA_USER                                 #User to use for the SAMBA share. You will connect with this user.
         REMOTE_PASS=$SAMBA_PASS                                 #The above user's password.
@@ -36,7 +36,7 @@ source "secrets.sh"
         
     #Sonarr
         SONARR_PORT=8989										#Port Sonarr should be served on
-        SONARR_ROOT_FOLDER=("/mnt/nas/series")		            #Folders to where you want to store series (Can already conatin a few)
+        SONARR_ROOT_FOLDER=("/mnt/nas/series")		            #Folders to where you want to store series (Can already contain a few)
         INDEXER_NAME=$INDEXER_NAME			           			#Indexer name
         INDEXER_URL=$INDEXER_URL		                    	#Indexer host name
         INDEXER_API_PATH=$INDEXER_API_PATH						#Indexer path to the api
@@ -44,7 +44,7 @@ source "secrets.sh"
         
     #Radarr
         RADARR_PORT=7878										#Port Radarr should be served on
-        RADARR_ROOT_FOLDER=("/mnt/nas/movies")		        	#Folders to where you want to store movies (Can already conatin a few)
+        RADARR_ROOT_FOLDER=("/mnt/nas/movies")		        	#Folders to where you want to store movies (Can already contain a few)
     
 #Constants
 app_uid=$SUDO_USER
@@ -120,7 +120,7 @@ then
             done
             
             if [ -z ${partitions} ]; then
-                echo "  Drive has no paritions: "
+                echo "  Drive has no partions: "
                 echo "  Attempting to create them now..."
 
                 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/disk/by-id/$drive
@@ -245,7 +245,7 @@ then
     # started under the account of $USER, as set below.
     #
     # Each setting is marked either "required" or "optional";
-    # leaving any required setting unconfigured will cause
+    # leaving any required setting un-configured will cause
     # the service to not start.
 
     # [required] user or uid of account to run the program as:

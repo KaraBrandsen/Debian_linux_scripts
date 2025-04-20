@@ -19,7 +19,7 @@ NWID=$NWID  				                #Your Zerotier Network ID - Get this from https:
 REMOTE_USER=$SAMBA_USER                     #User to use for the SAMBA share. You will connect with this user.
 REMOTE_PASS=$SAMBA_PASS                     #The above user's password.
 HDD_IDS=()                                  #The IDs of the HDD's you wan to add to the pool - Get from: ls -l /dev/disk/by-id
-MERGERFS_DIR="default"                      #The directory name where the merged forlder should be mounted
+MERGERFS_DIR="default"                      #The directory name where the merged folder should be mounted
 READ_ONLY_SHARES=no                         #Should the shared folder be read-only
 PHY_IFACE=default 							#The Network Interface to use - Default auto detects the interface
 DNS_1=8.8.8.8 								#DNS Server used by your ISP - Get this from ifconfig/connection properties on any PC or from your router. Leave as is to use Google's DNS server
@@ -145,7 +145,7 @@ then
             done
             
             if [ -z ${partitions} ]; then
-                echo "  Drive has no paritions: "
+                echo "  Drive has no partions: "
                 echo "  Attempting to create them now..."
 
                 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | fdisk /dev/disk/by-id/$drive

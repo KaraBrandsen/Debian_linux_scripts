@@ -7,7 +7,7 @@ green="\e[1;32m"
 red="\e[1;31m"
 undim="\e[0m"
 
-services=("zerotier-one" "deluge-web" "nginx" "plexmediaserver" "radarr" "sabnzbdplus" "smbd" "sonarr")
+services=("zerotier-one" "nginx" "plexmediaserver" "radarr" "sabnzbdplus" "smbd" "sonarr")
 # sort services
 IFS=$'\n' services=($(sort <<<"${services[*]}"))
 unset IFS

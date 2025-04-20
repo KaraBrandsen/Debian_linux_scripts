@@ -46,7 +46,7 @@ web:
       # We'll populate it with files in the next section
       path: /opt/scrutiny/web
   
-  # if you're runnning influxdb on a different host (or using a cloud-provider) you'll need to update the host & port below. 
+  # if you're running influxdb on a different host (or using a cloud-provider) you'll need to update the host & port below. 
   # token, org, bucket are unnecessary for a new InfluxDB installation, as Scrutiny will automatically run the InfluxDB setup, 
   # and store the information in the config file. If you 're re-using an existing influxdb installation, you'll need to provide
   # the `token`
