@@ -41,6 +41,6 @@ autoinstall:
     - curtin in-target -- git clone https://github.com/KaraBrandsen/Debian_linux_scripts.git /home/kara/Debian_linux_scripts
     - curtin in-target -- cp /home/kara/Debian_linux_scripts/install/setup.sh /home/kara/
     - curtin in-target -- chmod +x /home/kara/setup.sh
-    - curtin in-target -- wget <uri> -O /home/kara/secrets.sh
-    - curtin in-target -- chown -R kara:kara /home/kara
+    - curtin in-target -- wget <uri> -O /home/kara/Debian_linux_scripts/install/secrets.sh
+    - curtin in-target -- chown -R kara:kara /home/kara/*
   shutdown: reboot

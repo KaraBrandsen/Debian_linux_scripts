@@ -8,6 +8,8 @@ if [ ${SOURCED} -eq 0 ]; then
     
     #Variables
     KUMA_PORT=8080                                          #Port to be used for the Uptime Kuma Web Interface
+    SIGNAL_PORT=8079                                        #Port to be used for the Signal API used for notifications
+    WAHA_PORT=8079                                          #Port to be used for the Whatsapp API used for notifications
     
     #Common Scripts
     source "../secrets.sh"
@@ -16,32 +18,70 @@ fi
 
 KUMA_USER=$KUMA_USER                                    #Username to be used for the Uptime Kuma Web Interface
 KUMA_PASS=$KUMA_PASS                                    #Password to be used for the Uptime Kuma Web Interface
+WAHA_API_KEY=$WAHA_API_KEY                              #APIkey to be used by Uptime Kuma for the notification service
+WAHA_DASH_USER=$WAHA_DASH_USER                          #Username to be used for the WAHA Web Interface
+WAHA_DASH_PASS=$WAHA_DASH_PASS                          #Password to be used for the WAHA Web Interface
+WAHA_SWAGGER_USER=$WAHA_SWAGGER_USER                    #Username to be used for the WAHA Swagger
+WAHA_SWAGGER_PASS=$WAHA_SWAGGER_PASS                    #Password to be used for the WAHA Swagger
 
 
 echo "-----------------------------Installing Uptime Kuma-----------------------------"
 
-LATEST_VERSION=$(curl -s -L -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" https://api.github.com/repos/nvm-sh/nvm/releases | jq -r '.[0].tag_name')
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/$LATEST_VERSION/install.sh | bash
+cat <<EOF | tee docker-compose.yaml >/dev/null
+version: '3.3'
 
-NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:beta
+    container_name: uptime-kuma
+    volumes:
+      - ./uptime-kuma-data:/app/data
+    ports:
+      - $KUMA_PORT:3001  # <Host Port>:<Container Port>
+    restart: always
 
-nvm install 20
-npm install pm2 -g
+  signal-cli-rest-api:
+    image: bbernhard/signal-cli-rest-api
+    container_name: signal-api
+    volumes:
+      - /home/karabrandsen/.local/share/signal-api:/home/.local/share/signal-cli
+    ports:
+      - $SIGNAL_PORT:8080
+    restart: always
+    environment:
+      - MODE=native
 
-CUR_DIR=$PWD
-cd /opt
-rm -r ./uptime-kuma
+  waha:
+    image: devlikeapro/waha
+    ports:
+      - '$WAHA_PORT:3000/tcp'
+    volumes:
+      - './sessions:/app/.sessions'
+      - './.media:/app/.media'
+    restart: always
+    env_file:
+      - .env
+EOF
 
-git clone https://github.com/louislam/uptime-kuma.git
-cd uptime-kuma
-npm run setup
-npm install pm2 -g && pm2 install pm2-logrotate
-pm2 unstartup
-pm2 stop all
-pm2 start server/server.js --name uptime-kuma -- --host=0.0.0.0 --port=$KUMA_PORT
-pm2 save && pm2 startup
+cat <<EOF | tee docker-compose.yaml >/dev/null
+WAHA_BASE_URL=http://localhost:3000
+WHATSAPP_API_KEY=$WAHA_API_KEY
+WAHA_DASHBOARD_USERNAME=$WAHA_DASH_USER
+WAHA_DASHBOARD_PASSWORD=$WAHA_DASH_PASS
+WAHA_LOG_FORMAT=JSON
+WAHA_LOG_LEVEL=info
+WHATSAPP_DEFAULT_ENGINE=WEBJS
+WAHA_PRINT_QR=False
+WHATSAPP_SWAGGER_USERNAME=$WAHA_SWAGGER_USER
+WHATSAPP_SWAGGER_PASSWORD=$WAHA_SWAGGER_PASS
+WAHA_MEDIA_STORAGE=LOCAL
+WHATSAPP_FILES_LIFETIME=0
+WHATSAPP_FILES_FOLDER=/app/.media
+EOF
+
+docker compose up -d
+
+# Configuring Uptime Kuma
 
 python3 -m venv .
 source bin/activate
