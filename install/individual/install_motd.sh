@@ -6,6 +6,7 @@ echo "-----------------------------Installing MOTD Scripts----------------------
 apt install lolcat figlet -y
 
 rm /etc/update-motd.d/*
+echo Copying MOTD files.
 
 if [ ! -f "../../motd/$ARG/10-hostname" ] ; then
     if [ ! -f "./Debian_linux_scripts/motd/$ARG/10-hostname" ] ; then
@@ -17,7 +18,6 @@ else
     cp ../../motd/$ARG/* /etc/update-motd.d
 fi
 
-echo Copying MOTD files.
 /usr/bin/env figlet "$(hostname)" -w 100 | /usr/games/lolcat -f > /run/hostname_motd
 chmod +x -R /etc/update-motd.d/
 

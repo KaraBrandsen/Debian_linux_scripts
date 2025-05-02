@@ -13,7 +13,7 @@ autoinstall:
       name: direct
   identity:
     realname: 'Kara'
-    hostname: kara-server
+    hostname: KARA-SERVER
     password: "Run mkpasswd -m sha-512 ubuntupass"
     username: kara
   locale: "en_US.UTF-8"

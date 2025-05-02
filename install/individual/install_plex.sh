@@ -8,12 +8,13 @@ if [ ${SOURCED} -eq 0 ]; then
     #Common Scripts
     source "../common/disable_ip_v6.sh"
     source "../common/common_variables.sh"
+    source "../../fixes/intel_gpu_hw_transcoding_fix.sh"
+else
+    source "../fixes/intel_gpu_hw_transcoding_fix.sh"
 fi
 
 
 echo "-----------------------------Installing Plex-----------------------------"
-
-source "../../fixes/intel_gpu_hw_transcoding_fix.sh"
 
 curl -s https://downloads.plex.tv/plex-keys/PlexSign.key | apt-key add -
 echo deb https://downloads.plex.tv/repo/deb public main | tee /etc/apt/sources.list.d/plexmediaserver.list

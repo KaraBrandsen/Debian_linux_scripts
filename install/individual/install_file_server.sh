@@ -31,7 +31,7 @@ if [ ${#HDD_IDS[@]} -eq 0 ]; then
     echo "No HDD configured using default options"
     echo "Seaching for suitable drives..."
 
-    ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb\|nvme" | while read -r DRIVE ; do
+    ls /dev/disk/by-id | grep -v "part\|DVD\|CD\|mmc" | grep "ata\|usb" | while read -r DRIVE ; do
         echo "Found Drive: $DRIVE"
 
         PARTITIONS=$(ls /dev/disk/by-id | grep "$DRIVE-part1")
