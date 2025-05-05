@@ -189,10 +189,10 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
             snap install --classic code
         fi
 
-        flatpak install flathub com.google.Chrome com.discordapp.Discord org.videolan.VLC com.spotify.Client org.gimp.GIMP org.libreoffice.LibreOffice io.github.mimbrero.WhatsAppDesktop org.signal.Signal org.inkscape.Inkscape com.slack.Slack com.adobe.Reader com.skype.Client tv.plex.PlexDesktop cc.arduino.IDE2 org.raspberrypi.rpi-imager com.ultimaker.cura io.github.prateekmedia.appimagepool org.kicad.KiCad org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq org.wireshark.Wireshark us.zoom.Zoom com.github.tchx84.Flatseal -y
+        flatpak install flathub com.discordapp.Discord org.videolan.VLC com.spotify.Client org.gimp.GIMP org.libreoffice.LibreOffice io.github.mimbrero.WhatsAppDesktop org.signal.Signal org.inkscape.Inkscape com.slack.Slack com.adobe.Reader tv.plex.PlexDesktop cc.arduino.IDE2 org.raspberrypi.rpi-imager com.ultimaker.cura io.github.prateekmedia.appimagepool org.kicad.KiCad org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq org.wireshark.Wireshark us.zoom.Zoom com.github.tchx84.Flatseal -y
     else
         INSTALL_SHARES=true
-        flatpak install flathub com.google.Chrome org.videolan.VLC com.spotify.Client org.libreoffice.LibreOffice com.adobe.Reader com.skype.Client tv.plex.PlexDesktop io.github.prateekmedia.appimagepool org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq us.zoom.Zoom com.github.tchx84.Flatseal -y
+        flatpak install flathub org.videolan.VLC com.spotify.Client org.libreoffice.LibreOffice com.adobe.Reader tv.plex.PlexDesktop io.github.prateekmedia.appimagepool org.gnome.meld org.qbittorrent.qBittorrent com.notepadqq.Notepadqq us.zoom.Zoom com.github.tchx84.Flatseal -y
     fi
 fi 
 
