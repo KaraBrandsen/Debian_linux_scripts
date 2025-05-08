@@ -114,6 +114,9 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
+    INSTALL_DOCKER=true                     #Install Docker - set to false to skip
+    INSTALL_CONVERTX=false                  #Install ConvertX - set to false to skip
+    INSTALL_STIRLING_PDF=false              #Install Stirling PDF - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
     
     source "../fixes/radxa_x4_emmc_nqc_fix.sh"
@@ -138,6 +141,9 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
+    INSTALL_DOCKER=true                     #Install Docker - set to false to skip
+    INSTALL_CONVERTX=true                  #Install ConvertX - set to false to skip
+    INSTALL_STIRLING_PDF=true              #Install Stirling PDF - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     source "../fixes/inconsistent_file_system_prompt_fix.sh"
@@ -159,6 +165,9 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     INSTALL_SHARES=false                    #Install Windows Shares - set to false to skip
     INSTALL_SHELL_EXTENSIONS=true           #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=true            #Install Rustdesk Client - set to false to skip
+    INSTALL_DOCKER=true                     #Install Docker - set to false to skip
+    INSTALL_CONVERTX=false                  #Install ConvertX - set to false to skip
+    INSTALL_STIRLING_PDF=false              #Install Stirling PDF - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     if ! command -v gnome-shell 2>&1 >/dev/null ; then
@@ -278,6 +287,21 @@ fi
 #Rustdesk Client
 if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
     source "./individual/install_rustdesk_client.sh"
+fi
+
+#Docker
+if [ "$INSTALL_DOCKER" == "true" ] ; then
+    source "./individual/install_docker.sh"
+fi
+
+#ConvertX
+if [ "$INSTALL_CONVERTX" == "true" ] ; then
+    source "./individual/install_convertx.sh"
+fi
+
+#Stirling PDF
+if [ "$INSTALL_STIRLING_PDF" == "true" ] ; then
+    source "./individual/install_stirling_pdf.sh"
 fi
 
 #Install MOTD
