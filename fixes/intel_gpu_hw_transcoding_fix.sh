@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Applying fix Intel GPU hardware transcoding"
+
 INTEL_GPU=$(lspci -k | grep -EA3 'VGA|3D|Display' | grep "Intel" | xargs)
         
 if [ "$INTEL_GPU" != "" ]; then
@@ -23,3 +25,5 @@ if [ "$INTEL_GPU" != "" ]; then
         fi
     fi
 fi
+
+echo "Successfully applied fix Intel GPU hardware transcoding"

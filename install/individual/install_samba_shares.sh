@@ -22,36 +22,42 @@ apt install cifs-utils ntfs-3g -y
 for SHARE in ${WIN_SHARES[@]}; do
     mkdir -p /mnt/$SHARE
 
-    cat <<EOF | tee /etc/systemd/system/mnt-$SHARE.mount >/dev/null
-    [Unit]
-    Description=//$WIN_HOST/$SHARE
+cat <<EOF | tee /etc/systemd/system/mnt-$SHARE.mount >/dev/null
+[Unit]
+Description=//$WIN_HOST/$SHARE
+Requires=network-online.target
+After=network-online.target systemd-resolved.service
+Wants=network-online.target systemd-resolved.service
 
-    [Mount]
-    What=//$WIN_HOST/$SHARE
-    Where=/mnt/$SHARE
-    Type=cifs
-    Options=user=$WIN_USER,password=$WIN_PASS,uid=$APP_UID,gid=$APP_GUID
+[Mount]
+What=//$WIN_HOST/$SHARE
+Where=/mnt/$SHARE
+Type=cifs
+Options=user=$WIN_USER,password=$WIN_PASS,uid=$APP_UID,gid=$APP_GUID
 
-    [Install]
-    WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 EOF
 
-    cat <<EOF | tee /etc/systemd/system/mnt-$SHARE.automount >/dev/null
-    [Unit]
-    Description=Automount //$WIN_HOST/$SHARE
-    Requires=network-online.target
+cat <<EOF | tee /etc/systemd/system/mnt-$SHARE.automount >/dev/null
+[Unit]
+Description=Automount //$WIN_HOST/$SHARE
 
-    [Automount]
-    Where=/mnt/$SHARE
+[Automount]
+Where=/mnt/$SHARE
 
-    [Install]
-    WantedBy=multi-user.target
+[Install]
+WantedBy=multi-user.target
 EOF
 
     systemctl start mnt-$SHARE.mount
     systemctl enable mnt-$SHARE.automount
 
-    ln -s /mnt/$SHARE /home/$SUDO_USER/Desktop
+    if ! command -v gnome-shell 2>&1 >/dev/null ; then
+        echo "Gnome Shell could not be found. Not adding desktop shortcuts."
+    else
+        ln -s /mnt/$SHARE /home/$SUDO_USER/Desktop
+    fi
 done
 
 echo "Installled Windows Shares"

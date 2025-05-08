@@ -140,8 +140,8 @@ else
     else
         mkdir -p /mnt/$MERGERFS_DIR
 
-        echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs 0 0" >> /etc/fstab
-        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,moveonenospc=true,dropcacheonclose=true,minfreespace=5G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
+        echo "/mnt/disk*/ /mnt/$MERGERFS_DIR fuse.mergerfs defaults,nonempty,allow_other,use_ino,cache.files=off,category.create=mfs,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs 0 0" >> /etc/fstab
+        mergerfs -o defaults,nonempty,allow_other,use_ino,cache.files=off,category.create=mfs,moveonenospc=true,dropcacheonclose=true,minfreespace=10G,fsname=mergerfs /mnt/disk\* /mnt/$MERGERFS_DIR
     fi
 
     if [ "$REMOTE_USER" == "default" ]; then
@@ -166,8 +166,8 @@ else
         echo "    browsable = yes" >> /etc/samba/smb.conf
         echo "    force user = $APP_UID" >> /etc/samba/smb.conf
         echo "    force group = $APP_GUID" >> /etc/samba/smb.conf
-        echo "    create mask = 777" >> /etc/samba/smb.conf
-        echo "    directory mask = 777" >> /etc/samba/smb.conf
+        echo "    create mask = 775" >> /etc/samba/smb.conf
+        echo "    directory mask = 775" >> /etc/samba/smb.conf
 
         service smbd restart
         echo -ne "$REMOTE_PASS\n$REMOTE_PASS\n" | smbpasswd -a -s $REMOTE_USER

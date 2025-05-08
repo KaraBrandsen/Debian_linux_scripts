@@ -8,6 +8,7 @@ fi
 
 ZT_TOKEN=$ZT_TOKEN                                      #Your Zerotier API Token - Get this from https://my.zerotier.com/account -> "new token"
 NWID=$NWID                                              #Your Zerotier Network ID - Get this from https://my.zerotier.com/
+MEMBER_ID=$(zerotier-cli info | cut -d " " -f 3)
 
 if [ ${SOURCED} -eq 0 ]; then
     echo "Script is executing standalone. Using config in script"

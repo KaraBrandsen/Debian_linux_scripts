@@ -19,32 +19,37 @@ fi
 
 
 echo "-----------------------------Installing Shell Extensions-----------------------------"
-apt install gnome-menus dbus-x11 -y
 
-for i in "${EXTENSION_LIST[@]}" ; do
-    EXTENSION_ID=$(curl -s $i | grep -oP 'data-uuid="\K[^"]+')
-    SEARCH_ID=$(echo $EXTENSION_ID | cut -d '@' -f 1)
-    VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map."'$GNOME_VERSION'".pk')
-
-    echo "Installing: $EXTENSION_ID"
-
-    wget --inet4-only -O ${EXTENSION_ID}.zip "https://extensions.gnome.org/download-extension/${EXTENSION_ID}.shell-extension.zip?version_tag=$VERSION_TAG"
-    sudo -u $SUDO_USER -H -s gnome-extensions install --force ${EXTENSION_ID}.zip
-    sudo -u $SUDO_USER -H -s gnome-extensions enable ${EXTENSION_ID}
-    rm ${EXTENSION_ID}.zip
-done
-
-if [ "$EXTENSION_SETTINGS" == "default" ] ; then
-    echo "No extension settings configured"
+if ! command -v gnome-shell 2>&1 >/dev/null ; then
+    echo "Gnome Shell could not be found. Skipping installation of extensions."
 else
-    echo "Loading extension settings"
-    echo $EXTENSION_SETTINGS | base64 -d | gunzip >> /home/$SUDO_USER/extension_settings.conf
+    apt install gnome-menus dbus-x11 -y
 
-    sudo  -i -u $SUDO_USER bash <<-EOF
-    cat /home/$SUDO_USER/extension_settings.conf | dconf load /org/gnome/
+    for i in "${EXTENSION_LIST[@]}" ; do
+        EXTENSION_ID=$(curl -s $i | grep -oP 'data-uuid="\K[^"]+')
+        SEARCH_ID=$(echo $EXTENSION_ID | cut -d '@' -f 1)
+        VERSION_TAG=$(curl -Lfs "https://extensions.gnome.org/extension-query/?search=$SEARCH_ID" | jq '.extensions | map(select(.uuid=="'$EXTENSION_ID'")) | .[0].shell_version_map."'$GNOME_VERSION'".pk')
+
+        echo "Installing: $EXTENSION_ID"
+
+        wget --inet4-only -O ${EXTENSION_ID}.zip "https://extensions.gnome.org/download-extension/${EXTENSION_ID}.shell-extension.zip?version_tag=$VERSION_TAG"
+        sudo -u $SUDO_USER -H -s gnome-extensions install --force ${EXTENSION_ID}.zip
+        sudo -u $SUDO_USER -H -s gnome-extensions enable ${EXTENSION_ID}
+        rm ${EXTENSION_ID}.zip
+    done
+
+    if [ "$EXTENSION_SETTINGS" == "default" ] ; then
+        echo "No extension settings configured"
+    else
+        echo "Loading extension settings"
+        echo $EXTENSION_SETTINGS | base64 -d | gunzip >> /home/$SUDO_USER/extension_settings.conf
+
+        sudo  -i -u $SUDO_USER bash <<-EOF
+        cat /home/$SUDO_USER/extension_settings.conf | dconf load /org/gnome/
 EOF
 
-    rm /home/$SUDO_USER/extension_settings.conf
-fi
+        rm /home/$SUDO_USER/extension_settings.conf
+    fi
 
-echo "Installled Shell Extensions"
+    echo "Installled Shell Extensions"
+fi

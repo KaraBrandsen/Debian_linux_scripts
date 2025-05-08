@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Applying fix for inconsistent file system prompt"
+
 DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 
 if [[ $DEFAULT_CONFIG == *"fsck.mode=force"* ]] || [ "$DEFAULT_CONFIG" == "" ] ; then
@@ -11,3 +12,5 @@ else
     sed -i "s/$DEFAULT_CONFIG/$NEW_CONFIG/" "/etc/default/grub"
     update-grub
 fi
+
+echo "Successfully applied fix for inconsistent file system prompt"

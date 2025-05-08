@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Applying fix Radxa X4 NQC recovery bug"
+
 DEFAULT_CONFIG=$(grep "GRUB_CMDLINE_LINUX_DEFAULT" /etc/default/grub)
 SDHCI_CONTROLLER=$(lspci | grep "SD Host")
 
@@ -11,3 +13,5 @@ else
     sed -i "s/$DEFAULT_CONFIG/$NEW_CONFIG/" "/etc/default/grub"
     update-grub
 fi
+
+echo "Successfully applied fix Radxa X4 NQC recovery bug"
