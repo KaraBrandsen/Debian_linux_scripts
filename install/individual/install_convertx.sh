@@ -16,7 +16,6 @@ if [ ! -f "/home/$SUDO_USER/docker-compose.yaml" ]; then
     echo "No Docker compose file found. Creating on now"
 
     cat <<EOF | tee "/home/$SUDO_USER/docker-compose.yaml" >/dev/null
-version: '3.3'
 services:
   convertx:
     image: ghcr.io/c4illin/convertx
