@@ -123,6 +123,7 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_DOCKER=true                     #Install Docker - set to false to skip
     INSTALL_CONVERTX=false                  #Install ConvertX - set to false to skip
     INSTALL_STIRLING_PDF=false              #Install Stirling PDF - set to false to skip
+    INSTALL_GLANCES=true                    #Install Glances - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
     
     source "../fixes/radxa_x4_emmc_nqc_fix.sh"
@@ -150,6 +151,7 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_DOCKER=true                     #Install Docker - set to false to skip
     INSTALL_CONVERTX=true                  #Install ConvertX - set to false to skip
     INSTALL_STIRLING_PDF=true              #Install Stirling PDF - set to false to skip
+    INSTALL_GLANCES=true                    #Install Glances - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     source "../fixes/inconsistent_file_system_prompt_fix.sh"
@@ -174,6 +176,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     INSTALL_DOCKER=true                     #Install Docker - set to false to skip
     INSTALL_CONVERTX=false                  #Install ConvertX - set to false to skip
     INSTALL_STIRLING_PDF=false              #Install Stirling PDF - set to false to skip
+    INSTALL_GLANCES=true                    #Install Glances - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
     if ! command -v gnome-shell 2>&1 >/dev/null ; then
@@ -211,8 +214,12 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     fi
 fi 
 
+if [ "$INSTALL_STIRLING_PDF" == "true" ] || [ "$INSTALL_CONVERTX" == "true" ] || [ "$INSTALL_HASS" == "true" ] || [ "$INSTALL_GLANCES" == "true" ]; then
+    INSTALL_DOCKER=true
+fi
+
 #Installing Common Items
-apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
+apt install curl nano jq yq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
 
 #Constants
 source "./common/common_variables.sh"
@@ -228,6 +235,11 @@ fi
 #Zerotier Router Setup
 if [ "$INSTALL_ZEROTIER_ROUTER" == "true" ] ; then
     source "./individual/install_zerotier_router.sh"
+fi
+
+#Docker
+if [ "$INSTALL_DOCKER" == "true" ] ; then
+    source "./individual/install_docker.sh"
 fi
 
 #PiHole
@@ -295,11 +307,6 @@ if [ "$INSTALL_RUSTDESK_CLIENT" == "true" ] ; then
     source "./individual/install_rustdesk_client.sh"
 fi
 
-#Docker
-if [ "$INSTALL_DOCKER" == "true" ] ; then
-    source "./individual/install_docker.sh"
-fi
-
 #ConvertX
 if [ "$INSTALL_CONVERTX" == "true" ] ; then
     source "./individual/install_convertx.sh"
@@ -308,6 +315,11 @@ fi
 #Stirling PDF
 if [ "$INSTALL_STIRLING_PDF" == "true" ] ; then
     source "./individual/install_stirling_pdf.sh"
+fi
+
+#Glances
+if [ "$INSTALL_GLANCES" == "true" ] ; then
+    source "./individual/install_glances.sh"
 fi
 
 #Install MOTD

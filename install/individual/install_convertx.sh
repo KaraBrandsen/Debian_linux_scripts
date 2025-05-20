@@ -7,15 +7,20 @@ if [ ${SOURCED} -eq 0 ]; then
     
     #Variables
     CONVERTX_PORT=8100                                       #Port Convertx should be served on
+
+    #Common Scripts
+    source "../common/common_variables.sh"
 fi
 
 
 echo "-----------------------------Installing ConvertX-----------------------------"
 
-if [ ! -f "/home/$SUDO_USER/docker-compose.yaml" ]; then
+mkdir -p $DOCKER_DIR/config/convertx/data
+
+if [ ! -f "$DOCKER_DIR/docker-compose.yaml" ]; then
     echo "No Docker compose file found. Creating on now"
 
-    cat <<EOF | tee "/home/$SUDO_USER/docker-compose.yaml" >/dev/null
+    cat <<EOF | tee "$DOCKER_DIR/docker-compose.yaml" >/dev/null
 services:
   convertx:
     image: ghcr.io/c4illin/convertx
@@ -27,17 +32,17 @@ services:
       - ALLOW_UNAUTHENTICATED=true
       - HTTP_ALLOWED=true
     volumes:
-      - ./data:/app/data
+      - $DOCKER_DIR/config/convertx/data:/app/data
 
 EOF
 else
     echo "Existing Docker compose file found. appending new services"
 
-    if grep -F "convertx" /home/$SUDO_USER/docker-compose.yaml ; then
+    if grep -F "convertx" $DOCKER_DIR/docker-compose.yaml ; then
         echo "Existing service found. Skipping appending."
     else
 
-    cat <<EOF | tee -a "/home/$SUDO_USER/docker-compose.yaml" >/dev/null
+    cat <<EOF | tee -a "$DOCKER_DIR/docker-compose.yaml" >/dev/null
   convertx:
     image: ghcr.io/c4illin/convertx
     container_name: ConvertX
@@ -48,7 +53,7 @@ else
       - ALLOW_UNAUTHENTICATED=true
       - HTTP_ALLOWED=true
     volumes:
-      - ./data:/app/data
+      - $DOCKER_DIR/config/convertx/data:/app/data
 
 EOF
     fi

@@ -5,6 +5,8 @@ APP_GUID=users
 HOST=$(hostname -I)
 HOSTNAME=$(hostname)
 IP_LOCAL=$(grep -oP '^\S*' <<<"$HOST")
+TIME_ZONE=Europe/Amsterdam
+DOCKER_DIR=/home/$SUDO_USER/docker
 
 if [ "$INSTALL_SHELL_EXTENSIONS" == "true" ] ; then
     if ! command -v gnome-shell 2>&1 >/dev/null ; then
