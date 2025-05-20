@@ -7,7 +7,7 @@ install -m 0755 -d /etc/apt/keyrings
 
 DISTRO=$(lsb_release -i | grep "Distributor" | cut -d ':' -f 2 | xargs | cut -d '.' -f 1)
 
-if [ "$DISTRO" == "Ubuntu" ] || [[ "$DISTRO" = "Zorin"* ]]; then
+if [ "$DISTRO" == "Ubuntu" ] || [ "$DISTRO" = "Zorin" ]; then
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     chmod a+r /etc/apt/keyrings/docker.asc
 

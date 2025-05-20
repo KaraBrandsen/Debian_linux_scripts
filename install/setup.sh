@@ -219,7 +219,7 @@ if [ "$INSTALL_STIRLING_PDF" == "true" ] || [ "$INSTALL_CONVERTX" == "true" ] ||
 fi
 
 #Installing Common Items
-apt install curl nano jq yq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
+apt install curl nano jq cron rsyslog whois iputils-ping bsdmainutils nethogs lolcat figlet gnupg2 build-essential openssh-server git python3-pip pipx python3-dev htop btop net-tools bzip2 ntfs-3g bmon software-properties-common apt-transport-https ca-certificates traceroute -y
 
 #Constants
 source "./common/common_variables.sh"
@@ -292,9 +292,9 @@ if [ "$INSTALL_UPTIME_KUMA" == "true" ] ; then
     source "./individual/install_uptime_kuma.sh"
 fi
 
-#Windows Shares
+#Samba Shares
 if [ "$INSTALL_SHARES" == "true" ] ; then
-    source "./individual/install_windows_shares.sh"
+    source "./individual/install_samba_shares.sh"
 fi
 
 #Shell Extensions
