@@ -87,3 +87,5 @@ else
 EOF
     fi
 fi
+
+docker compose up -d glances

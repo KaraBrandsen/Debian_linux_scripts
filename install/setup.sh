@@ -109,6 +109,7 @@ if [ "$ARG" == "nas" ]; then
     INSTALL_ZEROTIER_ROUTER=false           #Install Zerotier - set to false to skip
     INSTALL_PIHOLE=false                    #Install Pihole - set to false to skip
     INSTALL_HASS=false                      #Install Home Assistant - set to false to skip
+    INSTALL_Z2M=false                       #Install Zigbee2MQTT - set to false to skip
     INSTALL_LIBRE_SPEEDTEST=false           #Install Libre Speedtest Server - set to false to skip
     INSTALL_FILE_SERVER=true                #Install MergerFS and SAMBA - set to false to skip
     INSTALL_SABNZBD=true                    #Install SABNZBD - set to false to skip
@@ -137,6 +138,7 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_ZEROTIER_ROUTER=true            #Install Zerotier - set to false to skip
     INSTALL_PIHOLE=true                     #Install Pihole - set to false to skip
     INSTALL_HASS=true                       #Install Home Assistant - set to false to skip
+    INSTALL_Z2M=true                        #Install Zigbee2MQTT - set to false to skip
     INSTALL_LIBRE_SPEEDTEST=true            #Install Libre Speedtest Server - set to false to skip
     INSTALL_FILE_SERVER=false               #Install MergerFS and SAMBA - set to false to skip
     INSTALL_SABNZBD=false                   #Install SABNZBD - set to false to skip
@@ -149,8 +151,8 @@ if [ "$ARG" == "pihole" ]; then
     INSTALL_SHELL_EXTENSIONS=false          #Install Shell Extensions - set to false to skip
     INSTALL_RUSTDESK_CLIENT=false           #Install Rustdesk Client - set to false to skip
     INSTALL_DOCKER=true                     #Install Docker - set to false to skip
-    INSTALL_CONVERTX=true                  #Install ConvertX - set to false to skip
-    INSTALL_STIRLING_PDF=true              #Install Stirling PDF - set to false to skip
+    INSTALL_CONVERTX=true                   #Install ConvertX - set to false to skip
+    INSTALL_STIRLING_PDF=true               #Install Stirling PDF - set to false to skip
     INSTALL_GLANCES=true                    #Install Glances - set to false to skip
     INSTALL_CUSTOM_MOTD=true                #Install a custom greeting when logging in via SSH - set to false to skip
 
@@ -162,6 +164,7 @@ if [ "$ARG" == "desktop" ] || [ "$ARG" == "media" ] ; then
     INSTALL_ZEROTIER_ROUTER=false           #Install Zerotier - set to false to skip
     INSTALL_PIHOLE=false                    #Install Pihole - set to false to skip
     INSTALL_HASS=false                      #Install Home Assistant - set to false to skip
+    INSTALL_Z2M=false                       #Install Zigbee2MQTT - set to false to skip
     INSTALL_LIBRE_SPEEDTEST=false           #Install Libre Speedtest Server - set to false to skip
     INSTALL_FILE_SERVER=false               #Install MergerFS and SAMBA - set to false to skip
     INSTALL_SABNZBD=false                   #Install SABNZBD - set to false to skip
@@ -250,6 +253,11 @@ fi
 #Home Assistant
 if [ "$INSTALL_HASS" == "true" ] ; then
     source "./individual/install_hass.sh"
+fi
+
+#Zigbee2MQTT
+if [ "$INSTALL_Z2M" == "true" ] ; then
+    source "./individual/install_zigbee2mqtt.sh"
 fi
 
 #Libre Speed Test

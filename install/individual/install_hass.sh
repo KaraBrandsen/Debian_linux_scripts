@@ -9,8 +9,22 @@ if [ ${SOURCED} -eq 0 ]; then
     source "../common/common_variables.sh"
 fi
 
+MQTT_PORT=8888
 
 echo "-----------------------------Installing Home Assistant-----------------------------"
+
+echo "Installing moquitto MQTT broker:"
+sudo apt install -y mosquitto mosquitto-clients
+
+if grep -F "listener $MQTT_PORT" /etc/mosquitto/mosquitto.conf ; then
+    echo "Mosquito already configured"
+else
+    echo " " >> /etc/mosquitto/mosquitto.conf
+    echo "listener $MQTT_PORT" >> /etc/mosquitto/mosquitto.conf
+    echo "allow_anonymous true" >> /etc/mosquitto/mosquitto.conf
+fi
+
+systemctl restart mosquitto
 
 mkdir -p $DOCKER_DIR/config/hass/
 
@@ -62,4 +76,4 @@ EOF
     fi
 fi
 
-docker compose up -d
+docker compose up -d homeassistant
