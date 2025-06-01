@@ -25,8 +25,8 @@ for ((i = 0; i < num_disks; i++)) ; do
 
         if [ -f "/opt/smart_monitor/hdd_${disk}.status" ] ; then
             read -r disk_data < /opt/smart_monitor/hdd_${disk}.status
-            state=$(echo $disk_data | cut -d ',' -f 4)
-            smart_status=$(echo $disk_data | cut -d ',' -f 3)
+            state=$(echo $disk_data | jq -r '.state')
+            smart_status=$(echo $disk_data | jq -r '.status')
         fi
 
         disk_status=$(smartctl --all "/dev/${disk}" --json)

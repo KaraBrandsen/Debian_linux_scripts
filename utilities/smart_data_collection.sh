@@ -70,6 +70,6 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.value')
         fi
 
-        echo "${DISK},${TEMP},${STATUS},${STATE}" > /opt/smart_monitor/hdd_${DISK}.status
+        echo '{"disk":"'${DISK}'","temperature":'${TEMP}',"status":"'${STATUS}'","state":"'${STATE}'"}' > /opt/smart_monitor/hdd_${DISK}.status
     fi
 done
