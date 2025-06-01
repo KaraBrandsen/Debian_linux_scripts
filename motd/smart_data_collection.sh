@@ -12,7 +12,7 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
 
     ERROR=$(echo $DISK_DATA | jq -r ".smartctl.messages.[0].severity")
 
-    if [ "$ERROR" == "error" ] ; then
+    if [ "$ERROR" == "error" ] || [ "$ERROR" == "null" ]; then
         continue
     fi
 
@@ -21,6 +21,8 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
     if [ "$SMART_ENABLED" == "true" ] ; then
         STATUS="Failed"
         STATE="Degrading"
+        MODEL=$(echo $DISK_DATA | jq -r '.model_name')
+        MAKE=${MODEL:0:2}
         PASSED=$(echo $DISK_DATA | jq '.smart_status.passed')
 
         if [ "$PASSED" == "true" ] ; then
@@ -47,7 +49,7 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             if [ $CURRENT_REALLOCATED_SECTORS -gt 0 ] || [ $CURRENT_PENDING_SECTORS -gt 0 ]; then
                 STATUS="Warning"
 
-                if [ $CURRENT_REALLOCATED_SECTORS -eq $PREVIOUS_REALLOCATED_SECTORS ] || [ $CURRENT_PENDING_SECTORS -eq $PREVIOUS_PENDING_SECTORS ]; then
+                if [ $CURRENT_REALLOCATED_SECTORS -eq $PREVIOUS_REALLOCATED_SECTORS ] && [ $CURRENT_PENDING_SECTORS -eq $PREVIOUS_PENDING_SECTORS ]; then
                     if [ $TIMESTAMP -gt $EXPIRES ] ; then
                         STATE="Stable"
                     fi
@@ -62,7 +64,12 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             fi
         fi
         
-        TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].value')
-        echo "Disk: ${DISK} (${TEMP}), ${STATUS}, ${STATE}"
+        if [ "$MAKE" == "ST" ]; then
+            TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].value')
+        elif [ "$MAKE" == "WD" ]; then
+            TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.value')
+        fi
+
+        echo "${DISK},${TEMP},${STATUS},${STATE}" > /opt/smart_monitor/hdd_${DISK}.status
     fi
 done

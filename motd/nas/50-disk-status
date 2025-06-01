@@ -1,28 +1,35 @@
 #!/bin/bash
 
 # config
-MAX_TEMP=40
+MAX_TEMP=45
 # set column width
 COLUMNS=2
 # colors
 white="\e[39m"
 green="\e[1;32m"
+yellow="\e[1;33m"
 red="\e[1;31m"
 dim="\e[2m"
 undim="\e[0m"
 
 # disks to check
 num_disks=$(lsblk -J | jq '.blockdevices | length')
+disk_data=""
+state="N/A"
 
 out=""
 for ((i = 0; i < num_disks; i++)) ; do
     disk=$(lsblk -J | jq -r ".blockdevices.[$i].name")
 
     if [[ "$disk" = "sd"* ]]; then
-        disk_status=$(smartctl --all "/dev/${disk}" --json)
 
-        uuid=$(blkid -s UUID -o value "/dev/${disk}")
-        smart_status=$(echo $disk_status | jq '.smart_status.passed')
+        if [ -f "/opt/smart_monitor/hdd_${disk}.status" ] ; then
+            read -r disk_data < /opt/smart_monitor/hdd_${disk}.status
+            state=$(echo $disk_data | cut -d ',' -f 4)
+            smart_status=$(echo $disk_data | cut -d ',' -f 3)
+        fi
+
+        disk_status=$(smartctl --all "/dev/${disk}" --json)
         temp=$(echo $disk_status | jq -r '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.string' | cut -d " " -f 1)
 
         # color green if temp <= MAX_TEMP, else red
@@ -35,17 +42,28 @@ for ((i = 0; i < num_disks; i++)) ; do
         if [[ "$temp" =~ ^[0-9]+$ ]]; then
             temp="${temp}C"
         fi
+
         # color green if status is "without error", else red
-        if [[ "${smart_status}" == "true" ]]; then
-            status="Healthy"
+        if [[ "${smart_status}" == "Passed" ]]; then
+            status="Passed"
             status_color=$green
+        elif [[ "${smart_status}" == "Warning" ]]; then
+            status="Warning"
+            status_color=$yellow
         else
             status_color=$red
             status="Failed"
         fi
 
+        # color green if state is "stable", else red
+        if [[ "${state}" == "Stable" ]]; then
+            state_color=$green
+        else
+            state_color=$red
+        fi
+
         # print temp & smartd error
-        out+="${disk}:,${color}${temp}${undim} | ${status_color}${status}${undim},"
+        out+="${disk}:,${color}${temp}${undim} | ${status_color}${status}${undim} (${state_color}${state}${undim}),"
         # insert \n every $COLUMNS column
         if [ $((($i+1) % $COLUMNS)) -eq 0 ]; then
             out+="\n"
