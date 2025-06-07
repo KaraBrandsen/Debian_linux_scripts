@@ -33,7 +33,7 @@ server {
     index index.html index.htm index.php;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files \$uri \$uri/ =404;
     }
 
     location ~ \.php$ {
@@ -69,7 +69,7 @@ else
     echo "@reboot $TARGET_DIR/smart_data_collection.sh >> $TARGET_DIR/log.txt 2>&1" >> root_cron
 fi
 
-echo ./$TARGET_DIR/smart_data_collection.sh show
+echo $TARGET_DIR/smart_data_collection.sh show
 
 crontab root_cron
 rm root_cron

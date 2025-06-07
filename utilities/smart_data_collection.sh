@@ -14,7 +14,7 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
 
     ERROR=$(echo $DISK_DATA | jq -r ".smartctl.messages.[0].severity")
 
-    if [ "$ERROR" == "error" ] || [ "$ERROR" == "null" ]; then
+    if [ "$ERROR" == "error" ]; then
         continue
     fi
 
@@ -31,6 +31,15 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             STATUS="Passed"
             CURRENT_REALLOCATED_SECTORS=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Reallocated_Sector_Ct")) | .[0].raw.value')
             CURRENT_PENDING_SECTORS=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Current_Pending_Sector")) | .[0].raw.value')
+
+            # Workaround for SSDs
+            if [ -z ${CURRENT_REALLOCATED_SECTORS} ] || [ "$CURRENT_REALLOCATED_SECTORS" == "null" ] ; then
+                CURRENT_REALLOCATED_SECTORS=0
+            fi
+
+            if [ -z ${CURRENT_PENDING_SECTORS} ] || [ "$CURRENT_PENDING_SECTORS" == "null" ] ; then
+                CURRENT_PENDING_SECTORS=0
+            fi
 
             if [ -f "/opt/smart_monitor/hdd_${DISK}.temp" ] ; then
                 mapfile -t OLD_DISK_DATA < /opt/smart_monitor/hdd_${DISK}.temp
@@ -83,6 +92,12 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].value')
         elif [ "$MAKE" == "WD" ]; then
             TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.value')
+        elif [ "$MAKE" == "GI" ]; then
+            TEMP=$(echo $DISK_DATA | jq -r '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.string' | cut -d ' ' -f 1)
+        elif [ "$MAKE" == "Hi" ]; then
+            TEMP=$(echo $DISK_DATA | jq -r '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.string' | cut -d ' ' -f 1)
+        else
+            TEMP=0
         fi
 
         if [ "$ARG" == "show" ]; then
