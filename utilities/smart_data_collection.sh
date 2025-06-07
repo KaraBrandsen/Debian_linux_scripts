@@ -2,6 +2,8 @@
 
 DISKS=$(lsblk --noempty --nodeps --dedup NAME --json --bytes | jq '.blockdevices | map(select(.size>10000000000))')
 
+ARG=${1:-"hide"}   
+
 NUM_DISKS=$(echo "$DISKS" | jq length)
 OLD_DISK_DATA=()
 TIMESTAMP=$(date +%s)
@@ -35,15 +37,21 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
                 EXPIRES=${OLD_DISK_DATA[0]}
                 PREVIOUS_REALLOCATED_SECTORS=${OLD_DISK_DATA[1]}
                 PREVIOUS_PENDING_SECTORS=${OLD_DISK_DATA[2]}
+                LAST_STABLE_REALLOCATED_SECTORS=${OLD_DISK_DATA[3]}
+                LAST_STABLE_PENDING_SECTORS=${OLD_DISK_DATA[4]}
             else
-                EXPIRES=$(( $TIMESTAMP + 1209600 ))
+                EXPIRES=$(( $TIMESTAMP + 1209600 )) # Keep current status for 2 weeks
                 PREVIOUS_REALLOCATED_SECTORS=$CURRENT_REALLOCATED_SECTORS
                 PREVIOUS_PENDING_SECTORS=$CURRENT_PENDING_SECTORS
+                LAST_STABLE_REALLOCATED_SECTORS=$PREVIOUS_REALLOCATED_SECTORS
+                LAST_STABLE_PENDING_SECTORS=$PREVIOUS_PENDING_SECTORS
 
                 mkdir /opt/smart_monitor
                 echo $EXPIRES > /opt/smart_monitor/hdd_${DISK}.temp
                 echo $CURRENT_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
                 echo $CURRENT_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                echo $LAST_STABLE_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                echo $LAST_STABLE_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
             fi
 
             if [ $CURRENT_REALLOCATED_SECTORS -gt 0 ] || [ $CURRENT_PENDING_SECTORS -gt 0 ]; then
@@ -52,12 +60,19 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
                 if [ $CURRENT_REALLOCATED_SECTORS -eq $PREVIOUS_REALLOCATED_SECTORS ] && [ $CURRENT_PENDING_SECTORS -eq $PREVIOUS_PENDING_SECTORS ]; then
                     if [ $TIMESTAMP -gt $EXPIRES ] ; then
                         STATE="Stable"
+                        echo $EXPIRES > /opt/smart_monitor/hdd_${DISK}.temp
+                        echo $CURRENT_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                        echo $CURRENT_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                        echo $CURRENT_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                        echo $CURRENT_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
                     fi
                 else
-                    EXPIRES=$(( $TIMESTAMP + 1209600 ))
+                    EXPIRES=$(( $TIMESTAMP + 1209600 )) # Keep current status for 2 weeks
                     echo $EXPIRES > /opt/smart_monitor/hdd_${DISK}.temp
                     echo $CURRENT_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
                     echo $CURRENT_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                    echo $LAST_STABLE_REALLOCATED_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
+                    echo $LAST_STABLE_PENDING_SECTORS >> /opt/smart_monitor/hdd_${DISK}.temp
                 fi
             else
                 STATE="Stable"
@@ -70,6 +85,10 @@ for ((i = 0; i < NUM_DISKS; i++)) ; do
             TEMP=$(echo $DISK_DATA | jq '.ata_smart_attributes.table | map(select(.name=="Temperature_Celsius")) | .[0].raw.value')
         fi
 
-        echo '{"disk":"'${DISK}'","temperature":'${TEMP}',"status":"'${STATUS}'","state":"'${STATE}'"}' > /opt/smart_monitor/hdd_${DISK}.status
+        if [ "$ARG" == "show" ]; then
+            echo '{"disk":"'${DISK}'","temperature":'${TEMP}',"status":"'${STATUS}'","state":"'${STATE}'","prev_pending_sectors":"'${LAST_STABLE_PENDING_SECTORS}'","current_pending_sectors":"'${CURRENT_PENDING_SECTORS}'","prev_reallocated_sectors":"'${LAST_STABLE_REALLOCATED_SECTORS}'","current_reallocated_sectors":"'${CURRENT_REALLOCATED_SECTORS}'"}' | jq '.'
+        fi
+
+        echo '{"disk":"'${DISK}'","temperature":'${TEMP}',"status":"'${STATUS}'","state":"'${STATE}'","prev_pending_sectors":"'${LAST_STABLE_PENDING_SECTORS}'","current_pending_sectors":"'${CURRENT_PENDING_SECTORS}'","prev_reallocated_sectors":"'${LAST_STABLE_REALLOCATED_SECTORS}'","current_reallocated_sectors":"'${CURRENT_REALLOCATED_SECTORS}'"}' > /opt/smart_monitor/hdd_${DISK}.status
     fi
 done

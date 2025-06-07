@@ -1,8 +1,17 @@
 #!/bin/bash
 
-#!/bin/bash
-
 #This script is intended to be used with uptime kuma to check for hardrive failures.
+SCRIPT_DIR=../utilities/smart_data_collection.sh
+
+(return 0 2>/dev/null) && SOURCED=1 || SOURCED=0
+
+if [ ${SOURCED} -eq 0 ]; then
+    echo "Script is executing standalone. Using config in script"
+
+    #Common Scripts
+    source "../common/common_variables.sh"
+    SCRIPT_DIR=../../utilities/smart_data_collection.sh
+fi
 
 HDD_CHECK_PORT=8092
 TARGET_DIR=/opt/smart_monitor  
@@ -46,7 +55,7 @@ systemctl reload nginx
 if [ ! -f "$TARGET_DIR/smart_data_collection.sh" ] ; then
     mkdir -p $TARGET_DIR
 
-    cp "../../utilities/smart_data_collection.sh" "$TARGET_DIR/smart_data_collection.sh"
+    cp "$SCRIPT_DIR" "$TARGET_DIR/smart_data_collection.sh"
     chmod +x "$TARGET_DIR/smart_data_collection.sh"
 fi
 
@@ -60,7 +69,7 @@ else
     echo "@reboot $TARGET_DIR/smart_data_collection.sh >> $TARGET_DIR/log.txt 2>&1" >> root_cron
 fi
 
-echo ./$TARGET_DIR/smart_data_collection.sh
+echo ./$TARGET_DIR/smart_data_collection.sh show
 
 crontab root_cron
 rm root_cron
@@ -80,18 +89,19 @@ chmod +x /home/$SUDO_USER/hdd_test.sh
 
 cat <<EOF | tee /var/www/html/hdd-check/index.php >/dev/null
 <?PHP
+    \$ret_val = '{"error":"HDD not found"}';
+
     if(isset(\$_GET["hdd"])){
         \$blk = shell_exec("lsblk -o NAME");
 
         if(str_contains(\$blk, \$_GET["hdd"])){
-            echo shell_exec("sudo /home/$SUDO_USER/hdd_test.sh " . \$_GET["hdd"]);
-        }
-        else{
-            echo '{"error":"HDD not found"}';
+            \$ret_val = shell_exec("sudo /home/$SUDO_USER/hdd_test.sh " . \$_GET["hdd"]);
         }
     }
     else{
-        echo shell_exec("sudo /home/$SUDO_USER/hdd_test.sh");
+        \$ret_val = shell_exec("sudo /home/$SUDO_USER/hdd_test.sh");
     }
+
+    echo json_encode(json_decode(\$ret_val), JSON_PRETTY_PRINT);
 ?>
 EOF
