@@ -23,7 +23,9 @@ if [ "$INTEL_GPU" != "" ]; then
             sudo apt update
             apt install -y libze1 intel-level-zero-gpu intel-opencl-icd clinfo linux-image-generic-hwe-24.04 intel-gpu-tools 
         fi
+
+        echo "Successfully applied fix Intel GPU hardware transcoding"
     fi
 fi
 
-echo "Successfully applied fix Intel GPU hardware transcoding"
+echo "GPU fix not required"
