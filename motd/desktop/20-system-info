@@ -13,7 +13,7 @@ PROCESS_USER=`echo "$PROCESS"| grep -v root | awk {'print $2'} | awk '{ SUM += $
 PROCESSOR_NAME=`grep "model name" /proc/cpuinfo | cut -d ' ' -f3- | awk {'print $0'} | head -1`
 PROCESSOR_COUNT=`grep -ioP 'processor\t:' /proc/cpuinfo | wc -l`
 # get IP
-PHY_IFACE=$(ifconfig | grep -E 'eth|enp|end' | cut -d ":" -f 1 | cut -d " " -f 1 | xargs)
+PHY_IFACE=$(ifconfig | grep -E 'eth|enp|end|wlp' | cut -d ":" -f 1 | cut -d " " -f 1 | xargs)
 ZT_IFACE=$(ifconfig | grep zt* | cut -d ":" -f 1 | head --lines 1)
 LOCAL_IP="$(ifconfig $PHY_IFACE | grep "inet " | xargs | cut -d " " -f 2)"
 ZT_IP="$(ifconfig $ZT_IFACE | grep "inet " | xargs | cut -d " " -f 2)"
